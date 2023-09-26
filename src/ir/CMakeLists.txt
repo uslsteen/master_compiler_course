@@ -1,2 +1,2 @@
-set(TARGET basic_block)
+set(TARGET ir)
 add_library(${TARGET} ${TARGET}.cc)
