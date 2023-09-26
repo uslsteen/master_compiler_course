@@ -1,7 +1,7 @@
 #ifndef INST_HH
 #define INST_HH
 
-namespace jjvm_jit {
+namespace jj_ir {
 //
 }
 

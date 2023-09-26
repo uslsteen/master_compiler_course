@@ -1,7 +1,7 @@
 #ifndef GRAPH_HH
 #define GRAPH_HH
 
-namespace jjvm_jit {
+namespace jj_ir {
 //
 }
 
