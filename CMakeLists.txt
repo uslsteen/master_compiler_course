@@ -24,6 +24,8 @@ option(BUILD_TESTS "Build tests" OFF)
 
 add_subdirectory(src)
 add_subdirectory(3rd_party)
+add_subdirectory(test)
+
 # add_subdirectory(tools)
 
 # Test running stuff
