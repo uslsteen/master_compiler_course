@@ -9,7 +9,7 @@ if("${CMAKE_BINARY_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
   You must delete them, or cmake will refuse to work.")
 endif()
 
-project(leech-compiler)
+project(jjvm_compiler)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
   string(APPEND CMAKE_CXX_FLAGS_RELEASE " -O2")
@@ -24,7 +24,7 @@ option(BUILD_TESTS "Build tests" OFF)
 
 add_subdirectory(src)
 add_subdirectory(3rd_party)
-add_subdirectory(test)
+add_subdirectory(tests)
 
 # add_subdirectory(tools)
 
