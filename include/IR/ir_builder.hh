@@ -15,6 +15,7 @@ private:
     iterator m_insert_pt;
 
 public:
+    IRBuilder() = default;
     IRBuilder(BasicBlock* bb) : m_bb(bb), m_insert_pt(bb->m_instr.end()) {}
 
     /**
@@ -27,7 +28,7 @@ public:
     template <typename T, typename... Args>
     T* create(Args&&... args) {
         auto* const created_instr =
-            m_bb->emplace_back<T>(std::forward<Args>(args)...);
+            m_bb->push_back<T>(std::forward<Args>(args)...);
         //
         created_instr->set_parent(m_bb);
         return created_instr;
