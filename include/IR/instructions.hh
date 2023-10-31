@@ -3,21 +3,22 @@
 
 #include "instruction.hh"
 //
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <limits>
 #include <ostream>
 #include <vector>
-#include <cassert>
-
-// llvm::CastInst mm;
 
 namespace jj_ir {
 
 class IfInstr final : public Instr {
-    //
+
     BasicBlock* m_true_bb = nullptr;
     BasicBlock* m_false_bb = nullptr;
     //
     Value* m_cond = nullptr;
-    //
+
 public:
     IfInstr(BasicBlock* true_bb, BasicBlock* false_bb, Value* cond = nullptr)
         : Instr(Opcode::IF),
@@ -31,6 +32,7 @@ public:
     auto true_bb() const noexcept { return m_true_bb; }
     auto false_bb() const noexcept { return m_false_bb; }
 
+    /// Override dump
     void dump(std::ostream& os) override {}
 };
 
@@ -49,6 +51,7 @@ public:
      */
     auto dst() const noexcept { return m_dst; }
 
+    /// Override dump
     void dump(std::ostream& os) override {}
 };
 
@@ -63,19 +66,20 @@ public:
      */
     auto retval() const noexcept { return m_retval; }
 
+    /// Override dump
     void dump(std::ostream& os) override {}
 };
 
-class BinOperator final : public Instr {
+class BinInstr final : public Instr {
 public:
     Value* m_lhs = nullptr;
     Value* m_rhs = nullptr;
 
 protected:
-    BinOperator(Opcode opc, Value* lhs, Value* rhs)
-        : Instr(lhs->get_type(), opc), m_lhs(lhs), m_rhs(rhs) {
+    BinInstr(Opcode opc, Value* lhs, Value* rhs)
+        : Instr(lhs->type(), opc), m_lhs(lhs), m_rhs(rhs) {
         //
-        assert(lhs->get_type() == rhs->get_type());
+        assert(lhs->type() == rhs->type());
     }
 
 public:
@@ -85,6 +89,7 @@ public:
     auto lhs() const noexcept { return m_lhs; }
     auto rhs() const noexcept { return m_rhs; }
 
+    /// Override dump
     void dump(std::ostream& os) override {}
 };
 
@@ -101,6 +106,7 @@ public:
         m_basic_blocks.push_back(input.second);
     }
 
+    /// Override dump
     void dump(std::ostream& os) override {}
 };
 
@@ -116,12 +122,45 @@ public:
      */
     auto src_val() const noexcept { return m_src_val; }
 
+    /// Override dump
     void dump(std::ostream& os) override {}
 };
 
-class Constant final : public Instr {
+template <typename Type>
+class Constant : public Instr {
     //
+    static_assert(std::numeric_limits<Type>::is_integer,
+                  "Standart integral type required.");
 };
+
+/**
+ * @brief Mapping standart c++ types to jj_ir custom types defined in TypeId
+ *        enum
+ */
+#define CONSTANT_SPEC(cstd_ty, jj_ir_ty)                            \
+    template <>                                                     \
+    class Constant<cstd_ty> : public Instr {                        \
+    private:                                                        \
+        cstd_ty m_val;                                              \
+                                                                    \
+    public:                                                         \
+        Constant(cstd_ty val)                                       \
+            : Instr{TypeId::jj_ir_ty, Opcode::CONST}, m_val(val) {} \
+                                                                    \
+        void dump(std::ostream& stream) override {}                 \
+                                                                    \
+        cstd_ty val() const { return m_val; }                       \
+    };                                                              \
+                                                                    \
+    using Const##jj_ir_ty = Constant<cstd_ty>;
+
+//
+
+CONSTANT_SPEC(bool, I1);
+CONSTANT_SPEC(int8_t, I8);
+CONSTANT_SPEC(int16_t, I16);
+CONSTANT_SPEC(int32_t, I32);
+CONSTANT_SPEC(int64_t, I64);
 
 }  // namespace jj_ir
 

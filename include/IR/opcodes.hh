@@ -24,6 +24,7 @@ enum class Opcode : uint16_t {
     /* Other */
     PHI,
     CAST,
+    CONST,
     //! NOTE: etc
 };
 

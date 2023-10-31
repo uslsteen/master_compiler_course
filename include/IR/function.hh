@@ -58,7 +58,6 @@ public:
 
     /**
      * @brief BasicBlock iterator forwarding functions
-     *
      * @return iterator
      */
     iterator begin() { return m_basic_blocks.begin(); }
@@ -69,6 +68,11 @@ public:
     size_t size() const { return m_basic_blocks.size(); }
     bool empty() const { return m_basic_blocks.empty(); }
     //
+
+    /**
+     * @brief Accessors methods to basic block into function
+     * @return const/non const BasicBlock& 
+     */
     const BasicBlock& front() const { return m_basic_blocks.front(); }
     BasicBlock& front() { return m_basic_blocks.front(); }
 

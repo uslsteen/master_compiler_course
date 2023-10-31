@@ -1,9 +1,12 @@
 #pragma once
 
+#include <cassert>
+//
 #include <type_traits>
 #include <utility>
-
+//
 #include "instruction.hh"
+#include "instructions.hh"
 #include "intrusive_list/ilist.hh"
 
 namespace jj_ir {
@@ -33,6 +36,12 @@ private:
     Function* m_parent = nullptr;
     //
     void set_parent(Function* parent) noexcept { m_parent = parent; }
+
+    //! NOTE: it should be hidden in private due access to private data & dumb
+    //!       func naming
+    void add_succ(BasicBlock* succ) noexcept { m_succs.push_back(succ); }
+    void add_pred(BasicBlock* pred) noexcept { m_succs.push_back(pred); }
+
     //
 public:
     BasicBlock() = default;
@@ -40,10 +49,10 @@ public:
 
     /**
      * @brief Creates a new basic block
-     * 
-     * @param[in] Parent 
-     * @param[in] InsertBefore 
-     * @return BasicBlock* 
+     *
+     * @param[in] Parent
+     * @param[in] InsertBefore
+     * @return BasicBlock*
      */
 #if 0 
     // TODO: implement it
@@ -52,6 +61,14 @@ public:
         return new BasicBlock{Parent, InsertBefore};
     }
 #endif
+
+    static void link_blocks(BasicBlock* succ, BasicBlock* pred) noexcept {
+        assert(succ && "Link basic blocks got nullptr successor");
+        assert(succ && "Link basic blocks got nullptr predcessor");
+        //
+        pred->add_succ(succ);
+        succ->add_pred(pred);
+    }
 
     /**
      * @brief Getters
@@ -82,20 +99,33 @@ public:
 
     ///
     void dump(std::ostream& os) {
-        os << m_bb_id << std::endl;
+        os << "bb id = " << m_bb_id << std::endl;
         for (auto&& instr : m_instr) instr.dump(os);
     }
 
 private:
     template <typename T, class... Args>
-    auto emplace_back(Args&&... args) {
-        static_assert(std::is_base_of<T, Instr>::value, "");
+    auto push_back(Args&&... args) {
         //
-        auto* const insterted = static_cast<T*>(
+        static_assert(std::is_base_of<Instr, T>::value,
+                      "Expected Instruction derived type");
+        auto* const inserted = static_cast<T*>(
             &emplace_back<T>(m_instr, std::forward<Args>(args)...));
         //
-        return insterted;
+        // NOTE: here
+        if constexpr (std::is_same_v<IfInstr, T>) {
+            link_blocks(inserted->true_bb(), this);
+            link_blocks(inserted->false_bb(), this);
+        } else if constexpr (std::is_same_v<BranchInstr, T>)
+            link_blocks(inserted->dst(), this);
+        //
+
+        // NOTE: is it really need ?
+        // insterted->set_parent(this);
+        return inserted;
     }
+
+    //
     friend IRBuilder;
 };
 }  // namespace jj_ir

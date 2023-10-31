@@ -13,6 +13,7 @@ namespace jj_ir {
  */
 enum class TypeId : uint8_t {
     NONE = 0,
+    I1 = 1,
     I8,
     I16,
     I32,
@@ -28,11 +29,13 @@ class Type final {
 
 public:
     Type(TypeId id = TypeId::NONE) : m_id(id) {}
-    TypeId get_type() const noexcept { return m_id; }
+    TypeId type() const noexcept { return m_id; }
 
     ///
-    template<TypeId id>
-    static Type create() { return Type{id}; }
+    template <TypeId id>
+    static Type create() {
+        return Type{id};
+    }
 };
 
 class Value {
@@ -46,7 +49,7 @@ public:
     /**
      * @brief Getters
      */
-    TypeId get_type() const noexcept { return m_type.get_type(); }
+    TypeId type() const noexcept { return m_type.type(); }
 };
 
 /**
