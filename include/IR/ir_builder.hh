@@ -1,6 +1,6 @@
-#include "ir.hh"
-#pragma oce
+#pragma once
 
+#include "instructions.hh"
 #include "basic_block.hh"
 
 namespace jj_ir {
@@ -18,7 +18,7 @@ public:
     IRBuilder(BasicBlock* bb) : m_bb(bb), m_insert_pt(bb->m_instr.end()) {}
 
     /**
-     * @brief Interface to create basic instruction
+     * @brief Interface to create basic block that contains any Instruction
               After allocation parent basic block should be set
 
      * @param[in] args

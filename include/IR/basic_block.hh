@@ -3,18 +3,18 @@
 #include <type_traits>
 #include <utility>
 
+#include "instruction.hh"
 #include "intrusive_list/ilist.hh"
-#include "ir.hh"
 
 namespace jj_ir {
+
+class Function;
 
 /**
  * @brief Linear part of the code
  *
  */
-class BasicBlock final : public Value,  // maybe it will be useful in future
-                                        //
-                         public ilist_node {
+class BasicBlock final : public ilist_detail::ilist_node {
 public:
     using InstrList = ilist<Instr>;
     //
@@ -22,7 +22,7 @@ public:
     using const_iterator = InstrList::const_iterator;
     using reverse_iterator = InstrList::iterator;
     using const_reverse_iterator = InstrList::const_reverse_iterator;
-
+    //
 private:
     uint32_t m_bb_id = 0;
     InstrList m_instr{};
@@ -30,10 +30,28 @@ private:
     std::vector<BasicBlock*> m_preds{};
     std::vector<BasicBlock*> m_succs{};
     //
-
+    Function* m_parent = nullptr;
+    //
+    void set_parent(Function* parent) noexcept { m_parent = parent; }
+    //
 public:
     BasicBlock() = default;
     explicit BasicBlock(std::uint32_t bb_id) : m_bb_id(bb_id) {}
+
+    /**
+     * @brief Creates a new basic block
+     * 
+     * @param[in] Parent 
+     * @param[in] InsertBefore 
+     * @return BasicBlock* 
+     */
+#if 0 
+    // TODO: implement it
+    static BasicBlock* create(Function* Parent = nullptr,
+                              BasicBlock* InsertBefore = nullptr) {
+        return new BasicBlock{Parent, InsertBefore};
+    }
+#endif
 
     /**
      * @brief Getters
@@ -45,6 +63,9 @@ public:
 
     auto preds_num() const noexcept { return m_preds.size(); }
     auto succs_num() const noexcept { return m_succs.size(); }
+
+    Function* get_parent() noexcept { return m_parent; }
+    const Function* get_parent() const noexcept { return m_parent; }
 
     /// Get front/back instruction of the basic block
     auto& front() const noexcept { return m_instr.front(); }
@@ -59,15 +80,13 @@ public:
     iterator end() { return m_instr.end(); }
     const_iterator end() const { return m_instr.begin(); }
 
-
     ///
     void dump(std::ostream& os) {
         os << m_bb_id << std::endl;
         for (auto&& instr : m_instr) instr.dump(os);
     }
 
-    //! NOTE: maybe it should private interface
-    //! NOTE: therefore only IRBuilder can modify and insert insturctions (more safety ???)
+private:
     template <typename T, class... Args>
     auto emplace_back(Args&&... args) {
         static_assert(std::is_base_of<T, Instr>::value, "");

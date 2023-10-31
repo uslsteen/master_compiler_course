@@ -172,8 +172,8 @@ using ilist_view =
     ilist_detail::ilist_impl<T, ilist_detail::ilist_noalloca_traits<T>>;
 
 template <class T, class... Args, class NodeTy>
-auto &emplace_back(ilist<NodeTy> ilist, Args &&...args) {
-    const auto *to_emplace = new T{std::forward<Args>(args)...};
+auto &emplace_back(ilist<NodeTy>& ilist, Args &&...args) {
+    auto *to_emplace = new T{std::forward<Args>(args)...};
     //
     ilist.push_back(to_emplace);
     return *to_emplace;
