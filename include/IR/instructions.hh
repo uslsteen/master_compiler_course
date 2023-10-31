@@ -1,97 +1,15 @@
 #ifndef INSTR_HH
 #define INSTR_HH
 
-#include "intrusive_list/ilist.hh"
-#include "opcodes.hh"
+#include "instruction.hh"
 //
-#include <array>
 #include <ostream>
 #include <vector>
+#include <cassert>
 
 // llvm::CastInst mm;
 
 namespace jj_ir {
-
-using namespace ilist_detail;
-
-/**
- * @brief Enum to describe instruction type
- *
- */
-enum class TypeId : uint8_t {
-    NONE = 0,
-    I8,
-    I16,
-    I32,
-    I64,
-};
-
-class IRBuilder;
-class Instr;
-class BasicBlock;
-
-class Type final {
-    TypeId m_id;
-
-public:
-    Type(TypeId id = TypeId::NONE) : m_id(id) {}
-    TypeId get_type() const noexcept { return m_id; }
-};
-
-class Value {
-protected:
-    Type m_type = TypeId::NONE;
-
-public:
-    Value() = default;
-    Value(Type type) : m_type(type) {}
-    //
-    /**
-     * @brief Getters
-     */
-    TypeId get_type() const noexcept { return m_type.get_type(); }
-};
-
-/**
- * @brief Base Instruction class
-          Instruction inherits Value due provide parameterized type of some
-          instructions
- *
- */
-class Instr : public Value, public ilist_node {
-    //
-    Opcode m_opcode = Opcode::NONE;
-    BasicBlock* m_parent = nullptr;
-    //
-protected:
-    Instr() = default;
-    //
-    Instr(Opcode opc, BasicBlock* bb = nullptr) : m_opcode(opc), m_parent(bb) {}
-    Instr(Type type, Opcode opc = Opcode::NONE, BasicBlock* bb = nullptr)
-        : Value{type}, m_opcode(opc), m_parent(bb) {}
-
-    void set_parent(BasicBlock* parent) noexcept { m_parent = parent; }
-    //
-public:
-    Instr(const Instr&) = delete;
-    Instr& operator=(const Instr&) = delete;
-    //
-    virtual ~Instr() = default;
-
-    /**
-     * @brief Getters
-     */
-    auto opcode() const noexcept { return m_opcode; }
-    auto type() const noexcept { return m_type; }
-    //
-    const BasicBlock* parent() const { return m_parent; }
-    BasicBlock* parent() { return m_parent; }
-
-    virtual void dump(std::ostream& os) = 0;
-    //
-    //
-    friend IRBuilder;
-};
 
 class IfInstr final : public Instr {
     //
