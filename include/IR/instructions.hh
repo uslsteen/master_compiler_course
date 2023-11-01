@@ -75,7 +75,8 @@ public:
     Value* m_lhs = nullptr;
     Value* m_rhs = nullptr;
 
-protected:
+    // protected:
+public:
     BinInstr(Opcode opc, Value* lhs, Value* rhs)
         : Instr(lhs->type(), opc), m_lhs(lhs), m_rhs(rhs) {
         //

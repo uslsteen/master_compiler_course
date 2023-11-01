@@ -45,7 +45,8 @@ private:
     //
 public:
     BasicBlock() = default;
-    explicit BasicBlock(std::uint32_t bb_id) : m_bb_id(bb_id) {}
+    explicit BasicBlock(std::uint32_t bb_id, Function* parent = nullptr)
+        : m_bb_id(bb_id), m_parent(parent) {}
 
     /**
      * @brief Creates a new basic block
@@ -75,14 +76,17 @@ public:
      */
     auto bb_id() const noexcept { return m_bb_id; }
 
-    auto size() const noexcept { return m_instr.size(); }
+    auto size() const noexcept {
+        return std::distance(m_instr.begin(), m_instr.end());
+    }
+    
     auto empty() const noexcept { return m_instr.empty(); }
 
     auto preds_num() const noexcept { return m_preds.size(); }
     auto succs_num() const noexcept { return m_succs.size(); }
 
-    Function* get_parent() noexcept { return m_parent; }
-    const Function* get_parent() const noexcept { return m_parent; }
+    Function* parent() noexcept { return m_parent; }
+    const Function* parent() const noexcept { return m_parent; }
 
     /// Get front/back instruction of the basic block
     auto& front() const noexcept { return m_instr.front(); }
@@ -95,7 +99,7 @@ public:
     const_iterator begin() const { return m_instr.begin(); }
 
     iterator end() { return m_instr.end(); }
-    const_iterator end() const { return m_instr.begin(); }
+    const_iterator end() const { return m_instr.end(); }
 
     ///
     void dump(std::ostream& os) {
@@ -109,6 +113,7 @@ private:
         //
         static_assert(std::is_base_of<Instr, T>::value,
                       "Expected Instruction derived type");
+        //
         auto* const inserted = static_cast<T*>(
             &emplace_back<T>(m_instr, std::forward<Args>(args)...));
         //
