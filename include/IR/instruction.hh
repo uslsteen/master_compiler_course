@@ -24,10 +24,17 @@ class IRBuilder;
 class Instr;
 class BasicBlock;
 
+
+/**
+ * @brief Type enum wrapper for standart jj_ir types, which described in Typeid
+ *        I suppose this class may be usefull in future during CastInstr implementation
+ */
 class Type final {
     TypeId m_id;
 
 public:
+    //! FIXME: maybe it unsafe make it non explicit, but currently
+    ///        I wanna have opportunity to create Type{} implicitly using TypeId
     Type(TypeId id = TypeId::NONE) : m_id(id) {}
     TypeId type() const noexcept { return m_id; }
 
@@ -38,13 +45,14 @@ public:
     }
 };
 
+/***/
 class Value {
 protected:
-    Type m_type = TypeId::NONE;
+    Type m_type{};
 
 public:
     Value() = default;
-    Value(Type type) : m_type(type) {}
+    explicit Value(Type type) : m_type(type) {}
     //
     /**
      * @brief Getters
@@ -82,7 +90,7 @@ public:
      * @brief Getters
      */
     auto opcode() const noexcept { return m_opcode; }
-    auto type() const noexcept { return m_type; }
+    // auto type() const noexcept { return m_type; }
     //
     const BasicBlock* parent() const { return m_parent; }
     BasicBlock* parent() { return m_parent; }

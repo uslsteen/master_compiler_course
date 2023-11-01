@@ -12,11 +12,13 @@ enum class InstType : uint8_t {
 enum class Opcode : uint16_t {
     /*  Default none value  */
     NONE,
-    /*  Arithmetic  */
+    /*  Binary instructions */
     ADD,
     SUB,
     MUL,
     DIV,
+    LE,
+    GE,
     /* Contorl flow */
     RET,
     BRANCH,

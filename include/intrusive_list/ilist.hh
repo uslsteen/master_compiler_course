@@ -90,10 +90,8 @@ public:
     ~ilist_impl() { clear(); }
 
     //! NOTE: iterators
-    iterator begin() noexcept { return ++iterator{&m_internal}; }
-    const_iterator begin() const noexcept {
-        return ++const_iterator{&m_internal};
-    }
+    iterator begin() noexcept { return std::next(end()); }
+    const_iterator begin() const noexcept { return std::next(end()); }
 
     iterator end() noexcept { return iterator{&m_internal}; }
     const_iterator end() const noexcept { return const_iterator{&m_internal}; }
@@ -136,8 +134,8 @@ public:
         return first;
     }
 
-    void push_front(pointer node) { insert(begin(), node); }
-    void push_back(pointer node) { insert(end(), node); }
+    void push_front(pointer node) noexcept { insert(begin(), node); }
+    void push_back(pointer node) noexcept { insert(end(), node); }
 
     //! NOTE: Splice in another list
     void splice(iterator pos, ilist_impl &other) noexcept {
@@ -172,9 +170,8 @@ using ilist_view =
     ilist_detail::ilist_impl<T, ilist_detail::ilist_noalloca_traits<T>>;
 
 template <class T, class... Args, class NodeTy>
-auto &emplace_back(ilist<NodeTy>& ilist, Args &&...args) {
+auto &emplace_back(ilist<NodeTy> &ilist, Args &&...args) {
     auto *to_emplace = new T{std::forward<Args>(args)...};
-    //
     ilist.push_back(to_emplace);
     return *to_emplace;
 }

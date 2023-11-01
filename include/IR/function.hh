@@ -4,13 +4,15 @@
 
 #include "basic_block.hh"
 #include "instruction.hh"
+#include "string_view"
 
 namespace jj_ir {
 
 using namespace ilist_detail;
 
-struct Param : public Value, public ilist_node {
-    explicit Param(Type type) : Value(type) {}
+class Param : public Value, public ilist_node {
+public:
+    Param(Type type) : Value(type) {}
 };
 
 /**
@@ -29,9 +31,9 @@ private:
     BasicBlockList m_basic_blocks;
     ParamList m_args;
     //
-    Type m_func_ty = TypeId::NONE;
+    Type m_func_ty{};
     std::string m_func_name{};
-
+    //
 public:
     Function() = default;
     Function(Type func_ty, const std::string& func_name)
@@ -43,13 +45,16 @@ public:
                                      Args&&... args) {
         auto* cur_func = new Function{func_ty, func_name};
         //
-        if constexpr (std::is_same_v<T, BasicBlock>)
-            emplace_back<T>(cur_func->m_basic_blocks,
-                            std::forward<Args>(args)...);
+        if constexpr (sizeof...(Args) > 0) {
+            if constexpr (std::is_same_v<T, BasicBlock>)
+                emplace_back<T>(cur_func->m_basic_blocks,
+                                std::forward<Args>(args)...);
+            //
+            else if constexpr (std::is_same_v<T, Param>)
+                emplace_back<T>(cur_func->m_args, std::forward<Args>(args)...);
+            //
+        }
         //
-        else if constexpr (std::is_same_v<T, Param>)
-            emplace_back<T>(cur_func->m_args, std::forward<Args>(args)...);
-
         return cur_func;
     }
 
@@ -62,22 +67,31 @@ public:
      */
     iterator begin() { return m_basic_blocks.begin(); }
     const_iterator begin() const { return m_basic_blocks.begin(); }
+    //
     iterator end() { return m_basic_blocks.end(); }
     const_iterator end() const { return m_basic_blocks.end(); }
 
-    size_t size() const { return m_basic_blocks.size(); }
+    /// O(n)
+    size_t size() const {
+        return m_basic_blocks.size();
+    }
+
+    /// O(1)
     bool empty() const { return m_basic_blocks.empty(); }
     //
 
     /**
      * @brief Accessors methods to basic block into function
-     * @return const/non const BasicBlock& 
+     * @return const/non const BasicBlock&
      */
     const BasicBlock& front() const { return m_basic_blocks.front(); }
     BasicBlock& front() { return m_basic_blocks.front(); }
 
     const BasicBlock& back() const { return m_basic_blocks.back(); }
     BasicBlock& back() { return m_basic_blocks.back(); }
+    //
+
+    std::string_view name() const noexcept { return m_func_name; }
 };
 
 template <typename T, typename... Args>
@@ -92,11 +106,11 @@ BasicBlock* Function::create<BasicBlock>() {
     uint32_t bb_id =
         m_basic_blocks.empty() ? 0 : m_basic_blocks.back().bb_id() + 1;
     //
-    return &emplace_back<BasicBlock>(m_basic_blocks, bb_id);
+    return &emplace_back<BasicBlock>(m_basic_blocks, bb_id, this);
 }
 
 template <>
-Param* Function::create<Param, Type>(Type&& type) {
+Param* Function::create<Param>(Type&& type) {
     return &emplace_back<Param>(m_args, type);
 }
 
