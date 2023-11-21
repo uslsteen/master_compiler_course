@@ -67,7 +67,7 @@ public:
 
     friend bool operator!=(const ilist_iterator& lhs,
                            const ilist_iterator rhs) noexcept {
-        return !(lhs == lhs);
+        return !(lhs == rhs);
     }
 
     //! NOTE: Increment, decrement operators

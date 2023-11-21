@@ -99,5 +99,6 @@ public:
     //
     //
     friend IRBuilder;
+    friend BasicBlock; 
 };
 }  // namespace jj_ir

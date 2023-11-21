@@ -45,9 +45,12 @@ protected:
                "Node which should be inserted is nullptr");
 
         auto *prev = next->get_prev();
-        to_insert->set_next(next);
+        if (prev != nullptr)
+            prev->set_next(to_insert);
+        //
         to_insert->set_prev(prev);
-        prev->set_next(to_insert);
+        to_insert->set_next(next);
+        //
         next->set_prev(to_insert);
     }
 

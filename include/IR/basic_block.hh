@@ -77,9 +77,9 @@ public:
     auto bb_id() const noexcept { return m_bb_id; }
 
     auto size() const noexcept {
-        return std::distance(m_instr.begin(), m_instr.end());
+        return m_instr.size();
     }
-    
+
     auto empty() const noexcept { return m_instr.empty(); }
 
     auto preds_num() const noexcept { return m_preds.size(); }
@@ -126,7 +126,7 @@ private:
         //
 
         // NOTE: is it really need ?
-        // insterted->set_parent(this);
+        inserted->set_parent(this);
         return inserted;
     }
 
