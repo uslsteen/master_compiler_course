@@ -40,7 +40,7 @@ private:
     //! NOTE: it should be hidden in private due access to private data & dumb
     //!       func naming
     void add_succ(BasicBlock* succ) noexcept { m_succs.push_back(succ); }
-    void add_pred(BasicBlock* pred) noexcept { m_succs.push_back(pred); }
+    void add_pred(BasicBlock* pred) noexcept { m_preds.push_back(pred); }
 
     //
 public:
@@ -76,14 +76,15 @@ public:
      */
     auto bb_id() const noexcept { return m_bb_id; }
 
-    auto size() const noexcept {
-        return m_instr.size();
-    }
+    auto size() const noexcept { return m_instr.size(); }
 
     auto empty() const noexcept { return m_instr.empty(); }
 
     auto preds_num() const noexcept { return m_preds.size(); }
     auto succs_num() const noexcept { return m_succs.size(); }
+
+    auto& preds() const noexcept { return m_preds; }
+    auto& succs() const noexcept { return m_succs; }
 
     Function* parent() noexcept { return m_parent; }
     const Function* parent() const noexcept { return m_parent; }

@@ -56,8 +56,8 @@ protected:
 
     //
     static void remove(node_base_type *to_remove) noexcept {
-        auto *prev = to_remove->get_prev();
         auto *next = to_remove->get_next();
+        auto *prev = to_remove->get_prev();
         //
         next->set_prev(prev);
         prev->set_next(next);
