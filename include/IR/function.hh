@@ -1,10 +1,11 @@
 #pragma once
 
 #include <type_traits>
+#include <string_view>
 
 #include "basic_block.hh"
 #include "instruction.hh"
-#include "string_view"
+#include "graph/bb_graph.hh"
 
 namespace jj_ir {
 
@@ -92,6 +93,11 @@ public:
     //
 
     std::string_view name() const noexcept { return m_func_name; }
+
+    auto bb_graph() const noexcept {
+        assert(!m_basic_blocks.empty() && "Error : function hasn't any basic blocks to create graph");
+        return jj_ir::graph::BBGraph{&m_basic_blocks.front(), m_basic_blocks.size()};
+    }
 };
 
 template <typename T, typename... Args>
