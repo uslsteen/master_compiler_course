@@ -4,8 +4,11 @@
 
 #include <IR/basic_block.hh>
 #include <IR/function.hh>
+#include <initializer_list>
 #include <memory>
 #include <vector>
+
+#include "graph/dom3.hh"
 
 namespace jj_ir::testing {
 //
@@ -14,12 +17,7 @@ protected:
     std::unique_ptr<jj_ir::Function> m_func{};
     std::vector<jj_ir::BasicBlock*> m_basic_blocks{};
     //
-    std::vector<uint32_t> preorder_ref{};
-    std::vector<uint32_t> postorder_ref{};
-    //
-    TestBuilder(std::initializer_list<uint32_t> preorder,
-                std::initializer_list<uint32_t> postorder)
-        : preorder_ref(preorder), postorder_ref(postorder) {}
+    TestBuilder() = default;
 
     void init_test(uint32_t graph_size, const std::string& func_name = {}) {
         assert(graph_size >= 0 &&
@@ -51,6 +49,16 @@ protected:
     void create_edge(char succ_let, char pred_let) {
         create_edge(letter_cast(succ_let), letter_cast(pred_let));
     }
+};
+
+class DFSInterface : public TestBuilder {
+protected:
+    std::vector<uint32_t> preorder_ref{};
+    std::vector<uint32_t> postorder_ref{};
+
+    DFSInterface(std::initializer_list<uint32_t> preord,
+                 std::initializer_list<uint32_t> postord)
+        : preorder_ref(preord), postorder_ref(postord) {}
 
     bool check_order(const std::vector<const jj_ir::BasicBlock*>& bbs,
                      const std::vector<uint32_t>& ref_order) {
@@ -64,191 +72,4 @@ protected:
     }
 };
 
-/**
- * @brief Wrapper of graph example 1, assignment 2
- *
- *            +---+
- *            | A |
- *            +---+
- *              |
- *              v
- *  +---+     +---+
- *  | C | <-- | B |
- *  +---+     +---+
- *    |         |
- *    |         v
- *    |       +---+     +---+
- *    |       | F | --> | G |
- *    |       +---+     +---+
- *    |         |         |
- *    |         v         |
- *    |       +---+       |
- *    |       | E |       |
- *    |       +---+       |
- *    |         |         |
- *    |         v         |
- *    |       +---+       |
- *    +-----> | D | <-----+
- *            +---+
- *
- */
-class DFSTest1 : public TestBuilder {
-protected:
-    DFSTest1() : TestBuilder({0, 1, 2, 3, 5, 4, 6}, {3, 2, 4, 6, 5, 1, 0}) {}
-    //
-    void create_test() {
-        init_test(7);
-        //
-        create_edge('B', 'A');
-        create_edge('C', 'B');
-        create_edge('F', 'B');
-        create_edge('E', 'F');
-        create_edge('G', 'F');
-        create_edge('D', 'G');
-        create_edge('D', 'E');
-        create_edge('D', 'C');
-    }
-};
-
-/**
- * @brief Wrapper of graph example 2, assignment 2
- *
- *           +---+
- *           | A |
- *           +---+
- *             |
- *             v
- *           +---+
- *   +-----> | B | --+
- *   |       +---+   |
- *   |         |     |
- *   |         |     |
- *   |         |   +---+
- *   |         |   | J |
- *   |         |   +---+
- *   |         |     |
- *   |         v     |
- *   |       +---+   |
- *   |   +-> | C | <-+
- *   |   |   +---+
- *   |   |     |
- *   |   |     v
- *   |   |   +---+
- *   |   +-- | D |
- *   |       +---+
- *   |         |
- *   |         v
- *   |       +---+
- *   |       | E | <-+
- *   |       +---+   |
- *   |         |     |
- *   |         v     |
- *   |       +---+   |
- *   |       | F | --+
- *   |       +---+
- *   |         |
- *   |         v
- * +---+     +---+
- * | H | <-- | G |
- * +---+     +---+
- *             |
- *             v
- *           +---+
- *           | I |
- *           +---+
- *             |
- *             v
- *           +---+
- *           | K |
- *           +---+
- *
- */
-class DFSTest2 : public TestBuilder {
-protected:
-    DFSTest2()
-        : TestBuilder({0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 9},
-                      {7, 10, 8, 6, 5, 4, 3, 2, 9, 1, 0}) {}
-
-    void create_test() {
-        init_test(11);
-        //
-        create_edge('B', 'A');
-        create_edge('C', 'B');
-        create_edge('J', 'B');
-        create_edge('D', 'C');
-        create_edge('C', 'D');
-        create_edge('E', 'D');
-        create_edge('F', 'E');
-        create_edge('E', 'F');
-        create_edge('G', 'F');
-        create_edge('H', 'G');
-        create_edge('I', 'G');
-        create_edge('B', 'H'); 
-        create_edge('K', 'I');
-        create_edge('C', 'J');
-    }
-};
-
-/**
- * @brief Wrapper of graph example 3, assignment 2
- *
- *       +-------------------------+
- *       |                         |
- *       |                 +---+   |
- *       |                 | A |   |
- *       |                 +---+   |
- *       |                   |     |
- *       |                   v     |
- *     +---+     +---+     +---+   |
- *     | F | <-- | E | <-- | B | <-+
- *     +---+     +---+     +---+
- *       |         |         |
- *       v         |         v
- *     +---+       |       +---+
- *  +- | H |       |       | C | <-+
- *  |  +---+       |       +---+   |
- *  |    |         |         |     |
- *  |    |         |         v     |
- *  |    |         |       +---+   |
- *  |    |         +-----> | D |   |
- *  |    |                 +---+   |
- *  |    |                   |     |
- *  |    |                   v     |
- *  |    |                 +---+   |
- *  |    +---------------> | G | --+
- *  |                      +---+
- *  |                        |
- *  |                        v
- *  |                      +---+
- *  |                      | I |
- *  |                      +---+
- *  |                        ^
- *  |                        |
- *  +------------------------+
- *
- */
-class DFSTest3 : public TestBuilder {
-protected:
-    DFSTest3()
-        : TestBuilder({0, 1, 2, 3, 6, 8, 4, 5, 7},
-                      {8, 6, 3, 2, 7, 5, 4, 1, 0}) {}
-
-    void create_test() {
-        init_test(9);
-        //
-        create_edge('B', 'A');
-        create_edge('C', 'B');
-        create_edge('E', 'B');
-        create_edge('D', 'C');
-        create_edge('G', 'D');
-        create_edge('D', 'E');
-        create_edge('F', 'E');
-        create_edge('B', 'F');
-        create_edge('H', 'F');
-        create_edge('C', 'G');
-        create_edge('I', 'G');
-        create_edge('G', 'H');
-        create_edge('I', 'H');
-    }
-};
 }  // namespace jj_ir::testing

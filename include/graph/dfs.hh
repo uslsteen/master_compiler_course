@@ -8,7 +8,7 @@
 #include <utility>
 #include <vector>
 
-namespace jj_ir::graph::algo_impl {
+namespace jj_ir::graph::dfs_impl {
 //
 
 template <class GraphTy, class DFSVisitorTy>
@@ -98,7 +98,7 @@ public:
 template <class GraphTy, class Visitor>
 class PreOrderVis : public IVisitor<GraphTy> {
     //
-    Visitor& m_vis;
+    Visitor m_vis;
 
 public:
     using const_node_pointer = typename GraphTy::const_node_pointer;
@@ -111,7 +111,7 @@ public:
 template <class GraphTy, class Visitor>
 class PostOrderVis : public IVisitor<GraphTy> {
     //
-    Visitor& m_vis;
+    Visitor m_vis;
 
 public:
     using const_node_pointer = typename GraphTy::const_node_pointer;
@@ -136,7 +136,7 @@ void deep_first_search_postoder(const GraphTy& graph, UserVisitorTy vis) {
     pass.dfs_impl();
 }
 
-}  // namespace jj_ir::graph::algo_impl
+}  // namespace jj_ir::graph::dfs_impl
 
 namespace jj_ir::graph {
 //
@@ -145,7 +145,7 @@ template <typename GraphTy>
 auto deep_first_search_preoder(const GraphTy& graph) {
     std::vector<typename GraphTy::const_node_pointer> bbs;
     auto init_bbs = [&](auto node) { bbs.push_back(node); };
-    algo_impl::deep_first_search_preoder(graph, init_bbs);
+    dfs_impl::deep_first_search_preoder(graph, init_bbs);
     //
     return bbs;
 }
@@ -155,7 +155,7 @@ template <typename GraphTy>
 auto deep_first_search_postoder(const GraphTy& graph) {
     std::vector<typename GraphTy::const_node_pointer> bbs;
     auto init_bbs = [&](auto node) { bbs.push_back(node); };
-    algo_impl::deep_first_search_postoder(graph, init_bbs);
+    dfs_impl::deep_first_search_postoder(graph, init_bbs);
     //
     return bbs;
 }

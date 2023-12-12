@@ -26,8 +26,10 @@ public:
     using reverse_iterator = InstrList::iterator;
     using const_reverse_iterator = InstrList::const_reverse_iterator;
     //
+    using id_type = uint32_t;
+    //
 private:
-    uint32_t m_bb_id = 0;
+    id_type m_bb_id = 0;
     InstrList m_instr{};
     //
     std::vector<BasicBlock*> m_preds{};
@@ -45,7 +47,7 @@ private:
     //
 public:
     BasicBlock() = default;
-    explicit BasicBlock(std::uint32_t bb_id, Function* parent = nullptr)
+    explicit BasicBlock(id_type bb_id, Function* parent = nullptr)
         : m_bb_id(bb_id), m_parent(parent) {}
 
     /**
@@ -74,7 +76,7 @@ public:
     /**
      * @brief Getters
      */
-    auto bb_id() const noexcept { return m_bb_id; }
+    id_type bb_id() const noexcept { return m_bb_id; }
 
     auto size() const noexcept { return m_instr.size(); }
 

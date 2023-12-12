@@ -45,7 +45,7 @@ public:
     node_iterator succs_begin(const_node_pointer pnode) const noexcept {
         return pnode->succs().begin();
     }
-
+    
     node_iterator preds_begin(const_node_pointer pnode) const noexcept {
         return pnode->preds().begin();
     }
@@ -84,7 +84,7 @@ public:
                 os << get_name(pred) << " -> " << name << ";\n";
         };
         //
-        algo_impl::deep_first_search_preoder(*this, dump_visitor);
+        dfs_impl::deep_first_search_preoder(*this, dump_visitor);
         os << "}";
     }
 
