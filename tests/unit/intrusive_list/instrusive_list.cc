@@ -6,9 +6,9 @@
 #include "intrusive_list/ilist.hh"
 #include "intrusive_list/ilist_base.hh"
 
-using namespace jj_ir::ilist_detail;
+using namespace jj_vm::ilist_detail;
 
-class TestNode final : public jj_ir::ilist_detail::ilist_node {
+class TestNode final : public jj_vm::ilist_detail::ilist_node {
     int m_data{};
 
 public:
@@ -22,7 +22,7 @@ public:
 class IListTest1 : public ::testing::Test {};
 
 TEST(IListTest1, empty) {
-    jj_ir::ilist<TestNode> ilist{};
+    jj_vm::ilist<TestNode> ilist{};
 
     EXPECT_TRUE(ilist.empty());
     EXPECT_EQ(ilist.begin(), ilist.end());
@@ -40,7 +40,7 @@ protected:
 };
 
 TEST_F(IListTest2, push_back) {
-    jj_ir::ilist<TestNode> ilist{};
+    jj_vm::ilist<TestNode> ilist{};
     //
     //
     ilist.push_back(node1.release());

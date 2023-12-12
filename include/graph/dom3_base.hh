@@ -2,7 +2,7 @@
 
 #include <vector>
 
-namespace jj_ir::graph::dom3_impl {
+namespace jj_vm::graph::dom3_impl {
 //
 
 template <class NodeTy>
@@ -39,4 +39,4 @@ public:
     auto push_idom(const_node_pointer pnode) { m_idommed.push_back(pnode); }
 };
 
-}  // namespace jj_ir::graph::dom3_impl
+}  // namespace jj_vm::graph::dom3_impl

@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-namespace jj_ir {
+namespace jj_vm::ir {
 
 enum class InstType : uint8_t {
 
@@ -30,6 +30,6 @@ enum class Opcode : uint16_t {
     //! NOTE: etc
 };
 
-}  // namespace jj_ir
+}  // namespace jj_vm
 
 #endif  // OPCODES_HH

@@ -8,7 +8,7 @@
 #include <utility>
 #include <vector>
 
-namespace jj_ir::graph::dfs_impl {
+namespace jj_vm::graph::dfs_impl {
 //
 
 template <class GraphTy, class DFSVisitorTy>
@@ -136,9 +136,9 @@ void deep_first_search_postoder(const GraphTy& graph, UserVisitorTy vis) {
     pass.dfs_impl();
 }
 
-}  // namespace jj_ir::graph::dfs_impl
+}  // namespace jj_vm::graph::dfs_impl
 
-namespace jj_ir::graph {
+namespace jj_vm::graph {
 //
 
 template <typename GraphTy>
@@ -167,4 +167,4 @@ auto deep_first_search_reverse_postoder(const GraphTy& graph) {
     //
     return bbs;
 }
-}  // namespace jj_ir::graph
+}  // namespace jj_vm::graph

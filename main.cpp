@@ -7,25 +7,25 @@
 
 int main() {
 
-    jj_ir::IRBuilder builder{};
+    jj_vm::IRBuilder builder{};
     //
-    auto* fib_func = jj_ir::Function::create_function<jj_ir::Param>(
-        jj_ir::Type::create<jj_ir::TypeId::I64>(), std::string{"fib"});
+    auto* fib_func = jj_vm::Function::create_function<jj_vm::Param>(
+        jj_vm::Type::create<jj_vm::TypeId::I64>(), std::string{"fib"});
     //
-    auto* v0 = fib_func->create<jj_ir::Param, jj_ir::Type>(jj_ir::TypeId::I32);
+    auto* v0 = fib_func->create<jj_vm::Param, jj_vm::Type>(jj_vm::TypeId::I32);
 
-    auto bb0 = fib_func->create<jj_ir::BasicBlock>();
-    auto bb1 = fib_func->create<jj_ir::BasicBlock>();
+    auto bb0 = fib_func->create<jj_vm::BasicBlock>();
+    auto bb1 = fib_func->create<jj_vm::BasicBlock>();
     //
-    jj_ir::BasicBlock::link_blocks(bb1, bb0);
+    jj_vm::BasicBlock::link_blocks(bb1, bb0);
     //
     //
     builder.set_insert_point(bb0);
     //
-    auto* v1 = builder.create<jj_ir::ConstI32>(1);
-    auto* v2 = builder.create<jj_ir::ConstI64>(2);
+    auto* v1 = builder.create<jj_vm::ConstI32>(1);
+    auto* v2 = builder.create<jj_vm::ConstI64>(2);
     //
-    auto branch_bb0_bb1 = builder.create<jj_ir::BranchInstr>(bb1);
+    auto branch_bb0_bb1 = builder.create<jj_vm::BranchInstr>(bb1);
 
     bb0->dump(std::cout);
     std::cout << bb0->size() << std::endl;

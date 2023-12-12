@@ -10,7 +10,7 @@
 #include <ostream>
 #include <vector>
 
-namespace jj_ir {
+namespace jj_vm::ir {
 
 class IfInstr final : public Instr {
 
@@ -135,7 +135,7 @@ class Constant : public Instr {
 };
 
 /**
- * @brief Mapping standart c++ types to jj_ir custom types defined in TypeId
+ * @brief Mapping standart c++ types to jj_vm custom types defined in TypeId
  *        enum
  */
 #define CONSTANT_SPEC(cstd_ty, jj_ir_ty)                            \
@@ -163,6 +163,6 @@ CONSTANT_SPEC(int16_t, I16);
 CONSTANT_SPEC(int32_t, I32);
 CONSTANT_SPEC(int64_t, I64);
 
-}  // namespace jj_ir
+}  // namespace jj_vm::ir
 
 #endif  // INSTR_HH

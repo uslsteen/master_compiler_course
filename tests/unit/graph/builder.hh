@@ -10,12 +10,12 @@
 
 #include "graph/dom3.hh"
 
-namespace jj_ir::testing {
+namespace jj_vm::testing {
 //
 class TestBuilder : public ::testing::Test {
 protected:
-    std::unique_ptr<jj_ir::Function> m_func{};
-    std::vector<jj_ir::BasicBlock*> m_basic_blocks{};
+    std::unique_ptr<jj_vm::ir::Function> m_func{};
+    std::vector<jj_vm::ir::BasicBlock*> m_basic_blocks{};
     //
     TestBuilder() = default;
 
@@ -26,10 +26,10 @@ protected:
         m_basic_blocks.clear();
         m_basic_blocks.resize(graph_size);
 
-        m_func = std::make_unique<Function>();
+        m_func = std::make_unique<jj_vm::ir::Function>();
         //
         std::generate(m_basic_blocks.begin(), m_basic_blocks.end(),
-                      [this] { return m_func->create<BasicBlock>(); });
+                      [this] { return m_func->create<jj_vm::ir::BasicBlock>(); });
     }
 
     size_t letter_cast(char letter) {
@@ -37,7 +37,7 @@ protected:
     }
 
     void create_edge(size_t succ_id, size_t pred_id) {
-        jj_ir::BasicBlock::link_blocks(m_basic_blocks.at(succ_id),
+        jj_vm::ir::BasicBlock::link_blocks(m_basic_blocks.at(succ_id),
                                        m_basic_blocks.at(pred_id));
     }
 
@@ -60,7 +60,7 @@ protected:
                  std::initializer_list<uint32_t> postord)
         : preorder_ref(preord), postorder_ref(postord) {}
 
-    bool check_order(const std::vector<const jj_ir::BasicBlock*>& bbs,
+    bool check_order(const std::vector<const jj_vm::ir::BasicBlock*>& bbs,
                      const std::vector<uint32_t>& ref_order) {
         if (bbs.size() != ref_order.size())
             return false;
@@ -78,15 +78,15 @@ protected:
     DominatorInterface() = default;
 
     void build() {
-        m_tree = jj_ir::graph::dom3_impl::DomTreeBuilder<
-            jj_ir::graph::BBGraph>::build(m_func->bb_graph());
+        m_tree = jj_vm::graph::dom3_impl::DomTreeBuilder<
+            jj_vm::graph::BBGraph>::build(m_func->bb_graph());
     }
     bool is_dominator(uint32_t dominator, uint32_t dominatee) {
         return m_tree.dominates(m_basic_blocks[dominator],
                                 m_basic_blocks[dominatee]);
     }
 
-    jj_ir::graph::dom3_impl::DomTree<jj_ir::graph::BBGraph> m_tree{};
+    jj_vm::graph::dom3_impl::DomTree<jj_vm::graph::BBGraph> m_tree{};
 };
 
-}  // namespace jj_ir::testing
+}  // namespace jj_vm::testing

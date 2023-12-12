@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-namespace jj_ir::ilist_detail {
+namespace jj_vm::ilist_detail {
 
 /**
  * @brief Base class for ilist nodes.
@@ -75,4 +75,4 @@ protected:
     }
 };
 
-}  // namespace jj_ir::ilist_detail
+}  // namespace jj_vm::ilist_detail

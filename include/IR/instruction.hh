@@ -5,7 +5,7 @@
 //
 #include <iostream>
 
-namespace jj_ir {
+namespace jj_vm::ir {
 
 /**
  * @brief Enum to describe instruction type
@@ -26,7 +26,7 @@ class BasicBlock;
 
 
 /**
- * @brief Type enum wrapper for standart jj_ir types, which described in Typeid
+ * @brief Type enum wrapper for standart jj_vm types, which described in Typeid
  *        I suppose this class may be usefull in future during CastInstr implementation
  */
 class Type final {
@@ -101,4 +101,4 @@ public:
     friend IRBuilder;
     friend BasicBlock; 
 };
-}  // namespace jj_ir
+}  // namespace jj_vm::ir

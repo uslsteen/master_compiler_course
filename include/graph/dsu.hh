@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace jj_ir::graph::dsu_impl {
+namespace jj_vm::graph::dsu_impl {
 
 template <class GraphTy>
 class DSU final {
@@ -101,4 +101,4 @@ private:
     }
 };
 
-}  // namespace jj_ir::graph::dsu_impl
+}  // namespace jj_vm::graph::dsu_impl

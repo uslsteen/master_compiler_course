@@ -7,7 +7,7 @@
 //
 #include "ilist_base.hh"
 
-namespace jj_ir::ilist_detail {
+namespace jj_vm::ilist_detail {
 //
 
 template <typename Type, bool Cond>
@@ -97,4 +97,4 @@ public:
     }
 };
 
-}  // namespace jj_ir::ilist_detail
+}  // namespace jj_vm::ilist_detail

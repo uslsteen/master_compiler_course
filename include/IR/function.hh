@@ -7,7 +7,7 @@
 #include "instruction.hh"
 #include "graph/bb_graph.hh"
 
-namespace jj_ir {
+namespace jj_vm::ir {
 
 using namespace ilist_detail;
 
@@ -96,7 +96,7 @@ public:
 
     auto bb_graph() const noexcept {
         assert(!m_basic_blocks.empty() && "Error : function hasn't any basic blocks to create graph");
-        return jj_ir::graph::BBGraph{&m_basic_blocks.front(), m_basic_blocks.size()};
+        return jj_vm::graph::BBGraph{&m_basic_blocks.front(), m_basic_blocks.size()};
     }
 };
 
@@ -120,4 +120,4 @@ Param* Function::create<Param>(Type&& type) {
     return &emplace_back<Param>(m_args, type);
 }
 
-}  // namespace jj_ir
+}  // namespace jj_vm::ir
