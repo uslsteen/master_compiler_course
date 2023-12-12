@@ -93,18 +93,6 @@ public:
     using DSUTy = typename jj_vm::graph::dsu_impl::DSU<GraphTy>;
 
 private:
-    explicit DomTreeBuilder(const GraphTy &graph)
-        : m_idoms(graph.size()),
-          m_sdoms(graph.size()),
-          m_sdommed_bucket(graph.size()) {
-        //
-        m_dfs_nodes.reserve(graph.size());
-        //
-        make_dfs(graph);
-        build_sdoms();
-        build_idoms();
-    }
-
     //! NOTE: Next comments were taken from the article
     //!       Dominator Tree of a Directed Graph
     //!              by Tanuj Khattar
@@ -133,6 +121,18 @@ private:
     std::vector<std::vector<const_node_pointer>> m_sdommed_bucket{};
 
     DomTree<GraphTy> m_tree;
+
+    explicit DomTreeBuilder(const GraphTy &graph)
+        : m_idoms(graph.size()),
+          m_sdoms(graph.size()),
+          m_sdommed_bucket(graph.size()) {
+        //
+        m_dfs_nodes.reserve(graph.size());
+        //
+        make_dfs(graph);
+        build_sdoms();
+        build_idoms();
+    }
 
     void reset() {
         m_dfs_nodes.clear();

@@ -72,7 +72,6 @@ protected:
     }
 };
 
-
 class DominatorInterface : public TestBuilder {
 protected:
     DominatorInterface() = default;
