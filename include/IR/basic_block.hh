@@ -26,8 +26,10 @@ public:
     using reverse_iterator = InstrList::iterator;
     using const_reverse_iterator = InstrList::const_reverse_iterator;
     //
+    using id_type = uint32_t;
+    //
 private:
-    uint32_t m_bb_id = 0;
+    id_type m_bb_id = 0;
     InstrList m_instr{};
     //
     std::vector<BasicBlock*> m_preds{};
@@ -40,12 +42,12 @@ private:
     //! NOTE: it should be hidden in private due access to private data & dumb
     //!       func naming
     void add_succ(BasicBlock* succ) noexcept { m_succs.push_back(succ); }
-    void add_pred(BasicBlock* pred) noexcept { m_succs.push_back(pred); }
+    void add_pred(BasicBlock* pred) noexcept { m_preds.push_back(pred); }
 
     //
 public:
     BasicBlock() = default;
-    explicit BasicBlock(std::uint32_t bb_id, Function* parent = nullptr)
+    explicit BasicBlock(id_type bb_id, Function* parent = nullptr)
         : m_bb_id(bb_id), m_parent(parent) {}
 
     /**
@@ -74,16 +76,17 @@ public:
     /**
      * @brief Getters
      */
-    auto bb_id() const noexcept { return m_bb_id; }
+    id_type bb_id() const noexcept { return m_bb_id; }
 
-    auto size() const noexcept {
-        return m_instr.size();
-    }
+    auto size() const noexcept { return m_instr.size(); }
 
     auto empty() const noexcept { return m_instr.empty(); }
 
     auto preds_num() const noexcept { return m_preds.size(); }
     auto succs_num() const noexcept { return m_succs.size(); }
+
+    auto& preds() const noexcept { return m_preds; }
+    auto& succs() const noexcept { return m_succs; }
 
     Function* parent() noexcept { return m_parent; }
     const Function* parent() const noexcept { return m_parent; }

@@ -72,12 +72,12 @@ public:
 
     //! NOTE: Increment, decrement operators
     ilist_iterator& operator++() noexcept {
-        m_ptr = IsReverse ? m_ptr->get_prev() : m_ptr->get_next();
+        m_ptr = m_ptr->get_next();// IsReverse ? m_ptr->get_prev() : m_ptr->get_next();
         return *this;
     }
 
     ilist_iterator& operator--() noexcept {
-        m_ptr = IsReverse ? m_ptr->get_next() : m_ptr->get_prev();
+        m_ptr = m_ptr->get_prev();// IsReverse ? m_ptr->get_next() : m_ptr->get_prev();
         return *this;
     }
 

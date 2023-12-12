@@ -115,7 +115,7 @@ public:
         return iterator{node};
     }
 
-    pointer remove(iterator pos) noexcept {
+    pointer remove(iterator& pos) noexcept {
         pointer next_pnode = &*pos++;
         ilist_detail::ilist_base::remove(next_pnode);
         return next_pnode;
@@ -129,9 +129,11 @@ public:
     }
 
     iterator erase(iterator first, iterator last) noexcept {
-        while (first != last) first = erase(first);
+        while (first != last){
+            first = erase(first);
+        }
         //
-        return first;
+        return last;
     }
 
     void push_front(pointer node) noexcept { insert(begin(), node); }

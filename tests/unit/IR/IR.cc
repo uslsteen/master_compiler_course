@@ -6,11 +6,8 @@
 #include "IR/ir_builder.hh"
 //
 
-TEST(Function, init) {
-    //
-}
+namespace jj_ir::testing {
 
-//
 // Code:
 // int64_t fact(int32_t n) {
 //     int64_t res = 1;
@@ -104,6 +101,7 @@ TEST(fib, init) {
         ASSERT_EQ(v1->get_next(), v2);
         ASSERT_EQ(v2->get_prev(), v1);
         ASSERT_EQ(branch_bb0_bb1->dst(), bb1);
+        //
     }
 
     //! NOTE: init bb1
@@ -146,6 +144,8 @@ TEST(fib, init) {
         //
         ASSERT_EQ(if_v4->true_bb(), bb2);
         ASSERT_EQ(if_v4->false_bb(), bb3);
+        //
+        ASSERT_NE(bb1->begin(), bb1->end());
     }
 
     //! NOTE: init bb2
@@ -205,4 +205,7 @@ TEST(fib, init) {
     // v5 = phi i64 [v1, bb0], [v9, bb2]
     v5->add_node(std::make_pair(v1, bb0));
     v5->add_node(std::make_pair(v7, bb2));
+    
+}
+
 }
