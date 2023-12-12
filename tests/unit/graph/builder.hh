@@ -72,4 +72,21 @@ protected:
     }
 };
 
+
+class DominatorInterface : public TestBuilder {
+protected:
+    DominatorInterface() = default;
+
+    void build() {
+        m_tree = jj_ir::graph::dom3_impl::DomTreeBuilder<
+            jj_ir::graph::BBGraph>::build(m_func->bb_graph());
+    }
+    bool is_dominator(uint32_t dominator, uint32_t dominatee) {
+        return m_tree.dominates(m_basic_blocks[dominator],
+                                m_basic_blocks[dominatee]);
+    }
+
+    jj_ir::graph::dom3_impl::DomTree<jj_ir::graph::BBGraph> m_tree{};
+};
+
 }  // namespace jj_ir::testing
