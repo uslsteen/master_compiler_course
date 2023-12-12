@@ -9,7 +9,7 @@
 
 #include "dfs.hh"
 
-namespace jj_ir::graph {
+namespace jj_vm::graph {
 
 /**
  * @brief Base graph of basic blocks
@@ -18,7 +18,7 @@ namespace jj_ir::graph {
  */
 class BBGraph final {
 public:
-    using value_type = BasicBlock;
+    using value_type = jj_vm::ir::BasicBlock;
     using node_pointer = value_type*;
     using const_node_pointer = const value_type*;
     using node_reference = value_type&;
@@ -26,10 +26,10 @@ public:
     using size_type = std::size_t;
     //
     //! NOTE: basically it should be iterator over succs and preds
-    using node_iterator = std::vector<BasicBlock*>::const_iterator;
+    using node_iterator = std::vector<jj_vm::ir::BasicBlock*>::const_iterator;
 
-    // std::vector<BasicBlock*>::iterator;
-    // using const_node_iterator = // std::vector<BasicBlock*>::const_iterator;
+    // std::vector<jj_vm::ir::BasicBlock*>::iterator;
+    // using const_node_iterator = // std::vector<jj_vm::ir::BasicBlock*>::const_iterator;
 
 private:
     const_node_pointer m_head{};
@@ -96,4 +96,4 @@ public:
     }
 };
 
-}  // namespace jj_ir::graph
+}  // namespace jj_vm::graph

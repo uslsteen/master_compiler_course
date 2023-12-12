@@ -6,7 +6,7 @@
 #include "IR/ir_builder.hh"
 //
 
-namespace jj_ir::testing {
+namespace jj_vm::ir::testing {
 
 // Code:
 // int64_t fact(int32_t n) {
@@ -21,33 +21,33 @@ namespace jj_ir::testing {
 
 TEST(fib, init) {
     //
-    jj_ir::IRBuilder builder{};
+    jj_vm::ir::IRBuilder builder{};
     //
     // def fact(v0 : i32) -> i64
 
-    auto* fib_func = jj_ir::Function::create_function<jj_ir::Param>(
-        jj_ir::Type::create<jj_ir::TypeId::I64>(), std::string{"fib"});
+    auto* fib_func = jj_vm::ir::Function::create_function<jj_vm::ir::Param>(
+        jj_vm::ir::Type::create<jj_vm::ir::TypeId::I64>(), std::string{"fib"});
 
-    auto* v0 = fib_func->create<jj_ir::Param, jj_ir::Type>(jj_ir::TypeId::I32);
+    auto* v0 = fib_func->create<jj_vm::ir::Param, jj_vm::ir::Type>(jj_vm::ir::TypeId::I32);
     //
-    auto bb0 = fib_func->create<jj_ir::BasicBlock>();
-    auto bb1 = fib_func->create<jj_ir::BasicBlock>();
-    auto bb2 = fib_func->create<jj_ir::BasicBlock>();
-    auto bb3 = fib_func->create<jj_ir::BasicBlock>();
+    auto bb0 = fib_func->create<jj_vm::ir::BasicBlock>();
+    auto bb1 = fib_func->create<jj_vm::ir::BasicBlock>();
+    auto bb2 = fib_func->create<jj_vm::ir::BasicBlock>();
+    auto bb3 = fib_func->create<jj_vm::ir::BasicBlock>();
     //
     {
         //! NOTE: fib function verification
         ASSERT_EQ(fib_func->name(), "fib");
-        ASSERT_EQ(v0->type(), jj_ir::TypeId::I32);
+        ASSERT_EQ(v0->type(), jj_vm::ir::TypeId::I32);
         //
         ASSERT_EQ(fib_func->front().bb_id(), 0);
         ASSERT_EQ(fib_func->back().bb_id(), 3);
         ASSERT_NE(&fib_func->front(), &fib_func->back());
     }
 
-    jj_ir::BasicBlock::link_blocks(bb1, bb0);
-    jj_ir::BasicBlock::link_blocks(bb2, bb1);
-    jj_ir::BasicBlock::link_blocks(bb3, bb1);
+    jj_vm::ir::BasicBlock::link_blocks(bb1, bb0);
+    jj_vm::ir::BasicBlock::link_blocks(bb2, bb1);
+    jj_vm::ir::BasicBlock::link_blocks(bb3, bb1);
     //
     {
         //! NOTE: basic blocks instrusive list verification
@@ -80,16 +80,16 @@ TEST(fib, init) {
 
     builder.set_insert_point(bb0);
     //
-    auto* v1 = builder.create<jj_ir::ConstI32>(1);
-    auto* v2 = builder.create<jj_ir::ConstI64>(2);
+    auto* v1 = builder.create<jj_vm::ir::ConstI32>(1);
+    auto* v2 = builder.create<jj_vm::ir::ConstI64>(2);
     //
-    auto branch_bb0_bb1 = builder.create<jj_ir::BranchInstr>(bb1);
+    auto branch_bb0_bb1 = builder.create<jj_vm::ir::BranchInstr>(bb1);
     //
     {
         //! NOTE: verification bb0
-        ASSERT_EQ(v1->type(), jj_ir::TypeId::I32);
-        ASSERT_EQ(v2->type(), jj_ir::TypeId::I64);
-        ASSERT_EQ(branch_bb0_bb1->opcode(), jj_ir::Opcode::BRANCH);
+        ASSERT_EQ(v1->type(), jj_vm::ir::TypeId::I32);
+        ASSERT_EQ(v2->type(), jj_vm::ir::TypeId::I64);
+        ASSERT_EQ(branch_bb0_bb1->opcode(), jj_vm::ir::Opcode::BRANCH);
         //
         ASSERT_EQ(v1->val(), 1);
         ASSERT_EQ(v2->val(), 2);
@@ -115,14 +115,14 @@ TEST(fib, init) {
     builder.set_insert_point(bb1);
 
     //! NOTE: phi i32 def, not init
-    auto* v3 = builder.create<jj_ir::PhiInstr>(jj_ir::TypeId::I32);
+    auto* v3 = builder.create<jj_vm::ir::PhiInstr>(jj_vm::ir::TypeId::I32);
 
     //! NOTE: cmp le
-    auto* v4 = builder.create<jj_ir::BinInstr>(jj_ir::Opcode::LE, v3, v0);
+    auto* v4 = builder.create<jj_vm::ir::BinInstr>(jj_vm::ir::Opcode::LE, v3, v0);
     //
     //! NOTE: phi i64 def, not init
-    auto* v5 = builder.create<jj_ir::PhiInstr>(jj_ir::TypeId::I64);
-    auto* if_v4 = builder.create<jj_ir::IfInstr>(bb2, bb3, v4);
+    auto* v5 = builder.create<jj_vm::ir::PhiInstr>(jj_vm::ir::TypeId::I64);
+    auto* if_v4 = builder.create<jj_vm::ir::IfInstr>(bb2, bb3, v4);
     //
     {
         //! NOTE: verification bb1
@@ -139,8 +139,8 @@ TEST(fib, init) {
         ASSERT_EQ(v5->get_prev(), v4);
         ASSERT_EQ(if_v4->get_prev(), v5);
         //
-        ASSERT_EQ(v3->type(), jj_ir::TypeId::I32);
-        ASSERT_EQ(v5->type(), jj_ir::TypeId::I64);
+        ASSERT_EQ(v3->type(), jj_vm::ir::TypeId::I32);
+        ASSERT_EQ(v5->type(), jj_vm::ir::TypeId::I64);
         //
         ASSERT_EQ(if_v4->true_bb(), bb2);
         ASSERT_EQ(if_v4->false_bb(), bb3);
@@ -159,16 +159,16 @@ TEST(fib, init) {
 
     builder.set_insert_point(bb2);
 
-    auto* v6 = builder.create<jj_ir::ConstI32>(1);
-    auto* v7 = builder.create<jj_ir::BinInstr>(jj_ir::Opcode::ADD, v3, v6);
-    auto* v8 = builder.create<jj_ir::CastInstr>(jj_ir::TypeId::I64, v3);
-    auto* v9 = builder.create<jj_ir::BinInstr>(jj_ir::Opcode::MUL, v5, v8);
+    auto* v6 = builder.create<jj_vm::ir::ConstI32>(1);
+    auto* v7 = builder.create<jj_vm::ir::BinInstr>(jj_vm::ir::Opcode::ADD, v3, v6);
+    auto* v8 = builder.create<jj_vm::ir::CastInstr>(jj_vm::ir::TypeId::I64, v3);
+    auto* v9 = builder.create<jj_vm::ir::BinInstr>(jj_vm::ir::Opcode::MUL, v5, v8);
     //
-    auto* branch_bb2_bb1 = builder.create<jj_ir::BranchInstr>(bb1);
+    auto* branch_bb2_bb1 = builder.create<jj_vm::ir::BranchInstr>(bb1);
     //
     {
         //! NOTE: verification bb2
-        ASSERT_EQ(v6->type(), jj_ir::TypeId::I32);
+        ASSERT_EQ(v6->type(), jj_vm::ir::TypeId::I32);
         ASSERT_EQ(v6->val(), 1);
         //
         ASSERT_EQ(v6->get_next(), v7);
@@ -194,7 +194,7 @@ TEST(fib, init) {
 
     builder.set_insert_point(bb3);
 
-    builder.create<jj_ir::RetInstr>(v5);
+    builder.create<jj_vm::ir::RetInstr>(v5);
 
     //! NOTE: init phi nodse
 

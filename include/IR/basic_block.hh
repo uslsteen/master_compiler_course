@@ -9,7 +9,7 @@
 #include "instructions.hh"
 #include "intrusive_list/ilist.hh"
 
-namespace jj_ir {
+namespace jj_vm::ir {
 
 class Function;
 
@@ -136,4 +136,4 @@ private:
     //
     friend IRBuilder;
 };
-}  // namespace jj_ir
+}  // namespace jj_vm::ir

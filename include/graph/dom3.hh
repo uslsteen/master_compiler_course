@@ -7,10 +7,10 @@
 #include "dom3_base.hh"
 #include "dsu.hh"
 
-namespace jj_ir::graph::dom3_impl {
+namespace jj_vm::graph::dom3_impl {
 //
 
-using BBDom3Node = dom3_impl::Dom3NodeBase<jj_ir::BasicBlock>;
+using BBDom3Node = dom3_impl::Dom3NodeBase<jj_vm::ir::BasicBlock>;
 
 template <class GraphTy>
 class DomTree final {
@@ -90,7 +90,7 @@ public:
     using const_node_pointer = typename GraphTy::const_node_pointer;
     using node_iterator = typename GraphTy::node_iterator;
     //
-    using DSUTy = typename jj_ir::graph::dsu_impl::DSU<GraphTy>;
+    using DSUTy = typename jj_vm::graph::dsu_impl::DSU<GraphTy>;
 
 private:
     explicit DomTreeBuilder(const GraphTy &graph)
@@ -160,7 +160,7 @@ private:
                 prev_node = node;
             };
         //
-        jj_ir::graph::dfs_impl::deep_first_search_preoder(graph, dom3_visitor);
+        jj_vm::graph::dfs_impl::deep_first_search_preoder(graph, dom3_visitor);
     }
 
     /**
@@ -188,7 +188,7 @@ private:
      *
      */
     void build_sdoms() {
-        jj_ir::graph::dsu_impl::DSU<GraphTy> dsu{m_sdoms, m_dfs_labels,
+        jj_vm::graph::dsu_impl::DSU<GraphTy> dsu{m_sdoms, m_dfs_labels,
                                                  m_dfs_nodes};
         const auto rend = m_dfs_nodes.rend();
         //
@@ -256,4 +256,4 @@ public:
     }
 };
 
-}  // namespace jj_ir::graph::dom3_impl
+}  // namespace jj_vm::graph::dom3_impl

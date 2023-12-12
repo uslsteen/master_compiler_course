@@ -1,5 +1,5 @@
 #pragma once
 
-namespace jj_ir::ilist_detail {
+namespace jj_vm::ilist_detail {
 //
 }

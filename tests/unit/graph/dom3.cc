@@ -3,7 +3,7 @@
 #include "builder.hh"
 #include "graph/dfs.hh"
 
-namespace jj_ir::testing {
+namespace jj_vm::testing {
 
 class Dom3Tree1 : public DominatorInterface {
 protected:
@@ -139,4 +139,4 @@ TEST_F(Dom3Tree3, basic) {
     ASSERT_TRUE(is_dominator(5, 7));
 }
 
-}  // namespace jj_ir::testing
+}  // namespace jj_vm::testing

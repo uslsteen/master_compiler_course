@@ -3,7 +3,7 @@
 #include "instructions.hh"
 #include "basic_block.hh"
 
-namespace jj_ir {
+namespace jj_vm::ir {
 
 class IRBuilder final {
     //
@@ -54,4 +54,4 @@ public:
     }
 };
 
-}  // namespace jj_ir
+}  // namespace jj_vm::ir

@@ -6,7 +6,7 @@
 #include "ilist_iterator.hh"
 #include "ilist_node.hh"
 
-namespace jj_ir {
+namespace jj_vm {
 namespace ilist_detail {
 
 class ilist_sentinel : public ilist_detail::ilist_node {
@@ -177,4 +177,4 @@ auto &emplace_back(ilist<NodeTy> &ilist, Args &&...args) {
     ilist.push_back(to_emplace);
     return *to_emplace;
 }
-}  // namespace jj_ir
+}  // namespace jj_vm
