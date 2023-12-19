@@ -11,13 +11,13 @@
 namespace jj_vm::graph::dfs_impl {
 //
 
+enum class DFSColors : uint8_t { WHITE = 0, GREY, BLACK };
+
 template <class GraphTy, class DFSVisitorTy>
 class DFSImpl final {
 public:
     using const_node_pointer = typename GraphTy::const_node_pointer;
     using node_iterator = typename GraphTy::node_iterator;
-
-    enum class DFSColors : bool { GREY = 0, RED = 1 };
 
     DFSImpl(const GraphTy& graph, DFSVisitorTy vis)
         : m_graph(graph), m_vis{vis} {}
@@ -69,7 +69,7 @@ public:
             }
             //
             if (cur_it == succ_end) {
-                put_color(parent, DFSColors::RED);
+                put_color(parent, DFSColors::BLACK);
                 m_vis.finish_node(parent);
                 continue;
             }
@@ -86,6 +86,7 @@ template <class GraphTy>
 class IVisitor {
 public:
     using const_node_pointer = typename GraphTy::const_node_pointer;
+
     //
     IVisitor() = default;
     virtual ~IVisitor() = default;
@@ -93,6 +94,8 @@ public:
     void virtual discover_node(const_node_pointer pnode) {}
     void virtual finish_node(const_node_pointer pnode) {}
     void virtual back_edge(const_node_pointer src, const_node_pointer dst) {}
+
+private:
 };
 
 template <class GraphTy, class Visitor>
@@ -123,7 +126,6 @@ public:
 
 template <typename GraphTy, typename UserVisitorTy>
 void deep_first_search_preoder(const GraphTy& graph, UserVisitorTy vis) {
-    //
     DFSImpl pass{graph, PreOrderVis<GraphTy, UserVisitorTy>{vis}};
     pass.dfs_impl();
 }
@@ -131,8 +133,14 @@ void deep_first_search_preoder(const GraphTy& graph, UserVisitorTy vis) {
 
 template <typename GraphTy, typename UserVisitorTy>
 void deep_first_search_postoder(const GraphTy& graph, UserVisitorTy vis) {
-    //
     DFSImpl pass{graph, PostOrderVis<GraphTy, UserVisitorTy>{vis}};
+    pass.dfs_impl();
+}
+
+template <typename GraphTy, typename UserVisitorTy>
+void deep_first_search(const GraphTy& graph, UserVisitorTy vis) {
+    static_assert(std::is_base_of<IVisitor<GraphTy>, UserVisitorTy>::value);
+    DFSImpl pass{graph, vis};
     pass.dfs_impl();
 }
 
