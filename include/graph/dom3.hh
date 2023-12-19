@@ -19,12 +19,19 @@ public:
     using node_pointer = typename GraphTy::node_pointer;
     using const_node_pointer = typename GraphTy::const_node_pointer;
     using node_iterator = typename GraphTy::node_iterator;
-    //
     using id_type = typename GraphTy::value_type::id_type;
+    //
+private:
+    std::unordered_map<id_type, Dom3NodeBase<value_type>> m_data{};
 
+    template <typename T>
+    friend class DomTreeBuilder;
+    //
+public:
     DomTree() = default;
 
-    bool dominates(node_pointer dominator, node_pointer dominatee) const {
+    bool dominates(const_node_pointer dominator,
+                   const_node_pointer dominatee) const {
         if (dominator == dominatee) return true;
 
         std::stack<id_type> stack{};
@@ -34,22 +41,29 @@ public:
             auto cur_id = stack.top();
             stack.pop();
 
-            auto res = m_dom3.find(cur_id);
+            auto res = m_data.find(cur_id);
 
-            if (res == m_dom3.end()) continue;
+            if (res == m_data.end()) continue;
 
             for (auto &&imm_dominated : res->second.idommed()) {
                 if (dominatee == imm_dominated) return true;
-
+                //
                 stack.push(imm_dominated->bb_id());
             }
         }
-        //
         return false;
     }
 
-    auto size() const noexcept { return m_dom3.size(); }
+    auto size() const noexcept { return m_data.size(); }
 
+    auto insert(const std::pair<id_type, Dom3NodeBase<value_type>> &val) {
+        return m_data.insert(val);
+    }
+
+    auto begin() const noexcept { return m_data.begin(); }
+    auto end() const noexcept { return m_data.end(); }
+
+private:
     node_iterator succs_begin(const_node_pointer pnode) const noexcept {
         return pnode->succs().begin();
     }
@@ -65,13 +79,6 @@ public:
     node_iterator preds_end(const_node_pointer pnode) const noexcept {
         return pnode->preds().end();
     }
-
-    auto insert(const std::pair<id_type, Dom3NodeBase<value_type>> &val) {
-        return m_dom3.insert(val);
-    }
-    //
-private:
-    std::unordered_map<id_type, Dom3NodeBase<value_type>> m_dom3{};
 };
 
 /**
@@ -93,23 +100,12 @@ public:
     using DSUTy = typename jj_vm::graph::dsu_impl::DSU<GraphTy>;
 
 private:
-    explicit DomTreeBuilder(const GraphTy &graph)
-        : m_idoms(graph.size()),
-          m_sdoms(graph.size()),
-          m_sdommed_bucket(graph.size()) {
-        //
-        m_dfs_nodes.reserve(graph.size());
-        //
-        make_dfs(graph);
-        build_sdoms();
-        build_idoms();
-    }
-
     //! NOTE: Next comments were taken from the article
     //!       Dominator Tree of a Directed Graph
     //!              by Tanuj Khattar
     //!
-    //! Therefore I decided to pass it here to save connection with original article
+    //! Therefore I decided to pass it here to save connection with original
+    //! article
 
     //! NOTE: mapping of i’th node to its new index, equal to the arrival
     //! time (id number after DFS) of node in
@@ -133,6 +129,18 @@ private:
     std::vector<std::vector<const_node_pointer>> m_sdommed_bucket{};
 
     DomTree<GraphTy> m_tree;
+
+    explicit DomTreeBuilder(const GraphTy &graph)
+        : m_idoms(graph.size()),
+          m_sdoms(graph.size()),
+          m_sdommed_bucket(graph.size()) {
+        //
+        m_dfs_nodes.reserve(graph.size());
+        //
+        make_dfs(graph);
+        build_sdoms();
+        build_idoms();
+    }
 
     void reset() {
         m_dfs_nodes.clear();

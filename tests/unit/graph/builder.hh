@@ -4,10 +4,12 @@
 
 #include <IR/basic_block.hh>
 #include <IR/function.hh>
+#include <cstddef>
 #include <initializer_list>
 #include <memory>
 #include <vector>
 
+#include "analysis/loop_analyzer.hh"
 #include "graph/dom3.hh"
 
 namespace jj_vm::testing {
@@ -28,17 +30,13 @@ protected:
 
         m_func = std::make_unique<jj_vm::ir::Function>();
         //
-        std::generate(m_basic_blocks.begin(), m_basic_blocks.end(),
-                      [this] { return m_func->create<jj_vm::ir::BasicBlock>(); });
+        std::generate(m_basic_blocks.begin(), m_basic_blocks.end(), [this] {
+            return m_func->create<jj_vm::ir::BasicBlock>();
+        });
     }
 
     size_t letter_cast(char letter) {
         return static_cast<size_t>(letter) - 'A';
-    }
-
-    void create_edge(size_t succ_id, size_t pred_id) {
-        jj_vm::ir::BasicBlock::link_blocks(m_basic_blocks.at(succ_id),
-                                       m_basic_blocks.at(pred_id));
     }
 
     bool check_succ(size_t succ_id, size_t pred_id) {
@@ -46,8 +44,14 @@ protected:
                 m_basic_blocks.at(succ_id));
     }
 
+    void make_edge(size_t succ_id, size_t pred_id) {
+        jj_vm::ir::BasicBlock::link_blocks(m_basic_blocks.at(succ_id),
+                                           m_basic_blocks.at(pred_id));
+    }
+
+
     void create_edge(char succ_let, char pred_let) {
-        create_edge(letter_cast(succ_let), letter_cast(pred_let));
+        make_edge(letter_cast(succ_let), letter_cast(pred_let));
     }
 };
 
@@ -72,7 +76,6 @@ protected:
     }
 };
 
-
 class DominatorInterface : public TestBuilder {
 protected:
     DominatorInterface() = default;
@@ -87,6 +90,61 @@ protected:
     }
 
     jj_vm::graph::dom3_impl::DomTree<jj_vm::graph::BBGraph> m_tree{};
+};
+
+/**
+ * @brief
+ *
+ */
+class LoopInterface : public TestBuilder {
+protected:
+    using loop_tree = jj_vm::analysis::loop::LoopTree<jj_vm::graph::BBGraph>;
+    using loop_base = loop_tree::loop_base;
+    using loop_base_pointer = loop_tree::loop_base_pointer;
+    //
+    using const_node_pointer = loop_tree::const_node_pointer;
+
+    LoopInterface() = default;
+
+    jj_vm::analysis::loop::LoopTree<jj_vm::graph::BBGraph> m_tree;
+    //
+    void build() {
+        m_tree = jj_vm::analysis::loop::LoopTreeBuilder<
+            jj_vm::graph::BBGraph>::build(m_func->bb_graph());
+    }
+
+    //
+    bool check_header(const loop_base* loop,
+                      std::optional<std::size_t> opt_id = std::nullopt) const {
+        auto expected_bb = opt_id ? m_basic_blocks.at(*opt_id) : nullptr;
+        return loop->header() == expected_bb;
+    }
+
+    //
+    auto* get_loop(size_t id) const {
+        auto res = m_tree.find(m_basic_blocks.at(id));
+        assert(res != m_tree.end() &&
+               "Error : loop three has no such basic blocks");
+        return res->second;
+    }
+
+    //
+    bool check_back_edges(const loop_base* loop,
+                          std::initializer_list<size_t> expected) {
+        std::set<const_node_pointer> expected_back_edges{};
+        for (auto id : expected)
+            expected_back_edges.insert(m_basic_blocks.at(id));
+        return loop->back_edges() == expected_back_edges;
+    }
+
+    //
+    bool check_inners(const loop_base* loop,
+                      const loop_base* other = nullptr) const {
+        if (other == nullptr)
+            return loop->inners().empty();
+        //
+        return loop->inners().find(other) != loop->inners().end();
+    }
 };
 
 }  // namespace jj_vm::testing
