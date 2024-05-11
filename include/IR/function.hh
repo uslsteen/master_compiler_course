@@ -94,7 +94,7 @@ public:
 
     std::string_view name() const noexcept { return m_func_name; }
 
-    auto bb_graph() const noexcept {
+    auto bb_graph() noexcept {
         assert(!m_basic_blocks.empty() && "Error : function hasn't any basic blocks to create graph");
         return jj_vm::graph::BBGraph{&m_basic_blocks.front(), m_basic_blocks.size()};
     }

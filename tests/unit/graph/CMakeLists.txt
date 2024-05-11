@@ -1,10 +1,6 @@
-set(TARGET dfs)
-add_executable(${TARGET}_test ${TARGET}.cc)
+set(TARGETS dfs dom3)
 
-#
-UPD_LIST(${TARGET}_test TESTLIST)
-
-set(TARGET dom3)
-add_executable(${TARGET}_test ${TARGET}.cc)
-#
-UPD_LIST(${TARGET}_test TESTLIST)
+foreach(TARGET ${TARGETS})
+    add_executable(${TARGET}_test ${TARGET}.cc)
+    UPD_LIST(${TARGET}_test TESTLIST)
+endforeach()

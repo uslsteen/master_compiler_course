@@ -15,6 +15,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
   string(APPEND CMAKE_CXX_FLAGS_RELEASE " -O2")
 endif()
 
+include(cmake/CPM.cmake)
 include(cmake/subdirs.cmake)
 include(cmake/upd_list.cmake)
 include(cmake/flags.cmake)
@@ -25,8 +26,6 @@ option(BUILD_TESTS "Build tests" OFF)
 add_subdirectory(src)
 add_subdirectory(3rd_party)
 add_subdirectory(tests)
-
-# add_subdirectory(tools)
 
 # Test running stuff
 if(BUILD_TESTS)
@@ -44,9 +43,6 @@ list(APPEND TARGETS ${LIBLIST} ${TOOLLIST})
 foreach(TARGET ${TARGETS})
   target_include_directories(${TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/include)
   target_compile_features(${TARGET} PRIVATE cxx_std_17)
-  
-  # NOTE: apply it since it will be released
-  # apply_compiler_flags(${TARGET} PUBLIC)
 
   if(ENABLE_WERROR)
     target_compile_options(${TARGET} PRIVATE -Werror)
