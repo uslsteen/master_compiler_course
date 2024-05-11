@@ -1,5 +1,6 @@
-set(TARGET loop_analyzer)
-add_executable(${TARGET}_test ${TARGET}.cc)
+set(TARGETS loop_analyzer order_analyzer)
 
-#
-UPD_LIST(${TARGET}_test TESTLIST)
+foreach(TARGET ${TARGETS})
+    add_executable(${TARGET}_test ${TARGET}.cc)
+    UPD_LIST(${TARGET}_test TESTLIST)
+endforeach()

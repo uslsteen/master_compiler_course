@@ -20,7 +20,7 @@ class BBGraph final {
 public:
     using value_type = jj_vm::ir::BasicBlock;
     using node_pointer = value_type*;
-    using const_node_pointer = const value_type*;
+    // using const_node_pointer = const value_type*;
     using node_reference = value_type&;
     using const_node_reference = const value_type&;
     using size_type = std::size_t;
@@ -32,29 +32,29 @@ public:
     // using const_node_iterator = // std::vector<jj_vm::ir::BasicBlock*>::const_iterator;
 
 private:
-    const_node_pointer m_head{};
+    node_pointer m_head{};
     size_type m_size{};
 
 public:
-    BBGraph(const_node_pointer head, size_t size) noexcept
+    BBGraph(node_pointer head, size_t size) noexcept
         : m_head(head), m_size(size) {}
 
-    const_node_pointer head() const noexcept { return m_head; }
+    node_pointer head() const noexcept { return m_head; }
     size_type size() const noexcept { return m_size; }
 
-    node_iterator succs_begin(const_node_pointer pnode) const noexcept {
+    node_iterator succs_begin(node_pointer pnode) const noexcept {
         return pnode->succs().begin();
     }
-    
-    node_iterator preds_begin(const_node_pointer pnode) const noexcept {
+
+    node_iterator preds_begin(node_pointer pnode) const noexcept {
         return pnode->preds().begin();
     }
 
-    node_iterator succs_end(const_node_pointer pnode) const noexcept {
+    node_iterator succs_end(node_pointer pnode) const noexcept {
         return pnode->succs().end();
     }
 
-    node_iterator preds_end(const_node_pointer pnode) const noexcept {
+    node_iterator preds_end(node_pointer pnode) const noexcept {
         return pnode->preds().end();
     }
 
@@ -70,8 +70,8 @@ public:
         //
         os << "digraph " << graph_name << "{\n";
         //
-        auto dump_visitor = [&](const_node_pointer pnode) {
-            auto get_name = [](const_node_pointer other) {
+        auto dump_visitor = [&](node_pointer pnode) {
+            auto get_name = [](node_pointer other) {
                 std::ostringstream ss;
                 ss << "bb" << other->bb_id();
                 return ss.str();

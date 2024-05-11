@@ -17,7 +17,7 @@ class DomTree final {
 public:
     using value_type = typename GraphTy::value_type;
     using node_pointer = typename GraphTy::node_pointer;
-    using const_node_pointer = typename GraphTy::const_node_pointer;
+    // using const_node_pointer = typename GraphTy::const_node_pointer;
     using node_iterator = typename GraphTy::node_iterator;
     using id_type = typename GraphTy::value_type::id_type;
     //
@@ -30,8 +30,8 @@ private:
 public:
     DomTree() = default;
 
-    bool dominates(const_node_pointer dominator,
-                   const_node_pointer dominatee) const {
+    bool dominates(node_pointer dominator,
+                   node_pointer dominatee) const {
         if (dominator == dominatee) return true;
 
         std::stack<id_type> stack{};
@@ -64,19 +64,19 @@ public:
     auto end() const noexcept { return m_data.end(); }
 
 private:
-    node_iterator succs_begin(const_node_pointer pnode) const noexcept {
+    node_iterator succs_begin(node_pointer pnode) const noexcept {
         return pnode->succs().begin();
     }
 
-    node_iterator preds_begin(const_node_pointer pnode) const noexcept {
+    node_iterator preds_begin(node_pointer pnode) const noexcept {
         return pnode->preds().begin();
     }
 
-    node_iterator succs_end(const_node_pointer pnode) const noexcept {
+    node_iterator succs_end(node_pointer pnode) const noexcept {
         return pnode->succs().end();
     }
 
-    node_iterator preds_end(const_node_pointer pnode) const noexcept {
+    node_iterator preds_end(node_pointer pnode) const noexcept {
         return pnode->preds().end();
     }
 };
@@ -94,7 +94,7 @@ public:
     using value_type = typename GraphTy::value_type;
     using id_type = typename value_type::id_type;
     using node_pointer = typename GraphTy::node_pointer;
-    using const_node_pointer = typename GraphTy::const_node_pointer;
+    //using node_pointer = typename GraphTy::node_pointer;
     using node_iterator = typename GraphTy::node_iterator;
     //
     using DSUTy = typename jj_vm::graph::dsu_impl::DSU<GraphTy>;
@@ -109,14 +109,14 @@ private:
 
     //! NOTE: mapping of i’th node to its new index, equal to the arrival
     //! time (id number after DFS) of node in
-    std::vector<const_node_pointer> m_dfs_nodes{};
+    std::vector<node_pointer> m_dfs_nodes{};
 
     //! NOTE: mapping of node id to DFS time (cost of arrival that based on
     //! order)
     std::unordered_map<id_type, id_type> m_dfs_labels{};
 
     //! NOTE: parent of node i in dfs tree
-    std::unordered_map<id_type, const_node_pointer> m_dfs_parents{};
+    std::unordered_map<id_type, node_pointer> m_dfs_parents{};
 
     //! NOTE: label of immediate-dominator of the i’th node
     std::vector<id_type> m_idoms{};
@@ -126,7 +126,7 @@ private:
 
     //! NOTE: For a vertex i, it stores a list of vertices for which i is the
     //! semi-dominator
-    std::vector<std::vector<const_node_pointer>> m_sdommed_bucket{};
+    std::vector<std::vector<node_pointer>> m_sdommed_bucket{};
 
     DomTree<GraphTy> m_tree;
 
@@ -154,7 +154,7 @@ private:
     void make_dfs(const GraphTy &graph) {
         //
         auto dom3_visitor =
-            [this, prev_node = graph.head()](const_node_pointer node) mutable {
+            [this, prev_node = graph.head()](node_pointer node) mutable {
                 const auto dfs_cost = m_dfs_nodes.size();
                 const auto id = node->bb_id();
                 //
@@ -177,7 +177,7 @@ private:
      * @param[in] node
      * @return auto
      */
-    auto min_sdom(const_node_pointer node, DSUTy &dsu) {
+    auto min_sdom(node_pointer node, DSUTy &dsu) {
         const auto node_dfs_cost = m_dfs_labels[node->bb_id()];
         auto &sdom = m_sdoms[node_dfs_cost];
         //

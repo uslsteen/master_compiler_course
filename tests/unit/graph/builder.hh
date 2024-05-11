@@ -5,10 +5,12 @@
 #include <IR/basic_block.hh>
 #include <IR/function.hh>
 #include <cstddef>
+#include <cstdint>
 #include <initializer_list>
 #include <memory>
 #include <vector>
 
+#include "analysis/linear_order.hh"
 #include "analysis/loop_analyzer.hh"
 #include "graph/dom3.hh"
 
@@ -49,7 +51,6 @@ protected:
                                            m_basic_blocks.at(pred_id));
     }
 
-
     void create_edge(char succ_let, char pred_let) {
         make_edge(letter_cast(succ_let), letter_cast(pred_let));
     }
@@ -64,7 +65,7 @@ protected:
                  std::initializer_list<uint32_t> postord)
         : preorder_ref(preord), postorder_ref(postord) {}
 
-    bool check_order(const std::vector<const jj_vm::ir::BasicBlock*>& bbs,
+    bool check_order(const std::vector<jj_vm::ir::BasicBlock*>& bbs,
                      const std::vector<uint32_t>& ref_order) {
         if (bbs.size() != ref_order.size())
             return false;
@@ -102,7 +103,7 @@ protected:
     using loop_base = loop_tree::loop_base;
     using loop_base_pointer = loop_tree::loop_base_pointer;
     //
-    using const_node_pointer = loop_tree::const_node_pointer;
+    using node_pointer = loop_tree::node_pointer;
 
     LoopInterface() = default;
 
@@ -131,7 +132,7 @@ protected:
     //
     bool check_back_edges(const loop_base* loop,
                           std::initializer_list<size_t> expected) {
-        std::set<const_node_pointer> expected_back_edges{};
+        std::set<node_pointer> expected_back_edges{};
         for (auto id : expected)
             expected_back_edges.insert(m_basic_blocks.at(id));
         return loop->back_edges() == expected_back_edges;
@@ -140,11 +141,43 @@ protected:
     //
     bool check_inners(const loop_base* loop,
                       const loop_base* other = nullptr) const {
-        if (other == nullptr)
-            return loop->inners().empty();
+        if (other == nullptr) return loop->inners().empty();
         //
         return loop->inners().find(other) != loop->inners().end();
     }
 };
 
+class LinearOrderInterface : public TestBuilder {
+protected:
+    using OrderTy = typename jj_ir::analysis::order::LinearOrderBuilder<
+        jj_vm::graph::BBGraph>::OrderTy;
+
+    OrderTy m_linear_order;
+
+    LinearOrderInterface() = default;
+
+    void build() {
+        jj_vm::graph::BBGraph graph = m_func->bb_graph();
+#if 0
+        std::filesystem::path path{"order_test.dot"};
+        graph.dot_dump(path, "order_test");
+#endif
+        auto loop_tree = jj_vm::analysis::loop::LoopTreeBuilder<
+            jj_vm::graph::BBGraph>::build(graph);
+
+        m_linear_order = jj_ir::analysis::order::LinearOrderBuilder<
+            jj_vm::graph::BBGraph>::build(m_func->bb_graph(), loop_tree);
+    }
+
+    bool check_order(const std::vector<uint32_t>& ref_order) {
+        if (m_linear_order.size() != ref_order.size())
+            return false;
+        else {
+            for (size_t i = 0; i < ref_order.size(); ++i)
+                if (m_linear_order.at(i)->bb_id() != ref_order.at(i))
+                    return false;
+            return true;
+        }
+    }
+};
 }  // namespace jj_vm::testing

@@ -16,7 +16,7 @@ enum class DFSColors : uint8_t { WHITE = 0, GREY, BLACK };
 template <class GraphTy, class DFSVisitorTy>
 class DFSImpl final {
 public:
-    using const_node_pointer = typename GraphTy::const_node_pointer;
+    using node_pointer = typename GraphTy::node_pointer;
     using node_iterator = typename GraphTy::node_iterator;
 
     DFSImpl(const GraphTy& graph, DFSVisitorTy vis)
@@ -26,8 +26,8 @@ private:
     GraphTy m_graph;
     DFSVisitorTy m_vis;
     //
-    std::unordered_map<const_node_pointer, DFSColors> m_visited;
-    std::stack<std::pair<node_iterator, const_node_pointer>> m_stack;
+    std::unordered_map<node_pointer, DFSColors> m_visited;
+    std::stack<std::pair<node_iterator, node_pointer>> m_stack;
     //
 
     /**
@@ -36,11 +36,11 @@ private:
      * @param[in] pnode
      * @param[in] color
      */
-    void put_color(const_node_pointer pnode, DFSColors color) {
+    void put_color(node_pointer pnode, DFSColors color) {
         m_visited[pnode] = color;
     }
 
-    void visit_node(const_node_pointer pnode, DFSColors color) {
+    void visit_node(node_pointer pnode, DFSColors color) {
         put_color(pnode, color);
         m_vis.discover_node(pnode);
         m_stack.push(std::make_pair(m_graph.succs_begin(pnode), pnode));
@@ -85,15 +85,15 @@ public:
 template <class GraphTy>
 class IVisitor {
 public:
-    using const_node_pointer = typename GraphTy::const_node_pointer;
+    using node_pointer = typename GraphTy::node_pointer;
 
     //
     IVisitor() = default;
     virtual ~IVisitor() = default;
     //
-    void virtual discover_node(const_node_pointer pnode) {}
-    void virtual finish_node(const_node_pointer pnode) {}
-    void virtual back_edge(const_node_pointer src, const_node_pointer dst) {}
+    void virtual discover_node(node_pointer pnode) {}
+    void virtual finish_node(node_pointer pnode) {}
+    void virtual back_edge(node_pointer src, node_pointer dst) {}
 
 private:
 };
@@ -104,11 +104,11 @@ class PreOrderVis : public IVisitor<GraphTy> {
     Visitor m_vis;
 
 public:
-    using const_node_pointer = typename GraphTy::const_node_pointer;
+    using node_pointer = typename GraphTy::node_pointer;
     //
     explicit PreOrderVis(Visitor vis) : m_vis{vis} {}
     //
-    void discover_node(const_node_pointer pnode) override { m_vis(pnode); }
+    void discover_node(node_pointer pnode) override { m_vis(pnode); }
 };
 
 template <class GraphTy, class Visitor>
@@ -117,11 +117,11 @@ class PostOrderVis : public IVisitor<GraphTy> {
     Visitor m_vis;
 
 public:
-    using const_node_pointer = typename GraphTy::const_node_pointer;
+    using node_pointer = typename GraphTy::node_pointer;
     //
     explicit PostOrderVis(Visitor vis) : m_vis{vis} {}
     //
-    void finish_node(const_node_pointer pnode) override { m_vis(pnode); }
+    void finish_node(node_pointer pnode) override { m_vis(pnode); }
 };
 
 template <typename GraphTy, typename UserVisitorTy>
@@ -151,7 +151,7 @@ namespace jj_vm::graph {
 
 template <typename GraphTy>
 auto deep_first_search_preoder(const GraphTy& graph) {
-    std::vector<typename GraphTy::const_node_pointer> bbs;
+    std::vector<typename GraphTy::node_pointer> bbs;
     auto init_bbs = [&](auto node) { bbs.push_back(node); };
     dfs_impl::deep_first_search_preoder(graph, init_bbs);
     //
@@ -161,7 +161,7 @@ auto deep_first_search_preoder(const GraphTy& graph) {
 
 template <typename GraphTy>
 auto deep_first_search_postoder(const GraphTy& graph) {
-    std::vector<typename GraphTy::const_node_pointer> bbs;
+    std::vector<typename GraphTy::node_pointer> bbs;
     auto init_bbs = [&](auto node) { bbs.push_back(node); };
     dfs_impl::deep_first_search_postoder(graph, init_bbs);
     //

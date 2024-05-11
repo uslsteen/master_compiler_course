@@ -57,7 +57,7 @@ public:
      * @param[in] InsertBefore
      * @return BasicBlock*
      */
-#if 0 
+#if 0
     // TODO: implement it
     static BasicBlock* create(Function* Parent = nullptr,
                               BasicBlock* InsertBefore = nullptr) {
@@ -92,8 +92,11 @@ public:
     const Function* parent() const noexcept { return m_parent; }
 
     /// Get front/back instruction of the basic block
-    auto& front() const noexcept { return m_instr.front(); }
-    auto& back() const noexcept { return m_instr.back(); }
+    auto& front() noexcept { return m_instr.front(); }
+    const auto& front() const noexcept { return m_instr.front(); }
+
+    auto& back() noexcept { return m_instr.back(); }
+    const auto& back() const noexcept { return m_instr.back(); }
 
     /**
      * @brief Iterators based in ilist methods
