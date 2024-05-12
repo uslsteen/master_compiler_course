@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "analysis/linear_order.hh"
+#include "analysis/liveness_analyzer.hh"
 #include "analysis/loop_analyzer.hh"
 #include "graph/dom3.hh"
 
@@ -178,6 +179,33 @@ protected:
                     return false;
             return true;
         }
+    }
+};
+
+class LivenessInterface : public TestBuilder {
+protected:
+    using LiveIntevalTy = jj_vm::analysis::liveness::LiveInterval;
+
+    jj_vm::analysis::liveness::LivenessAnalyzer<jj_vm::graph::BBGraph>
+        m_analyzer;
+
+    LivenessInterface() = default;
+
+    void build() {
+        m_analyzer = jj_vm::analysis::liveness::LivenessBuilder<
+            jj_vm::graph::BBGraph>::build(m_func->bb_graph());
+    }
+
+    //
+    bool check_live_invervals(const LiveIntevalTy& lhs,
+                              const LiveIntevalTy& rhs) {
+        //
+        return true;
+    }
+
+    bool check_live_numbers() {
+        //
+        return true;
     }
 };
 }  // namespace jj_vm::testing
