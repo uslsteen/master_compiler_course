@@ -55,6 +55,10 @@ protected:
     void create_edge(char succ_let, char pred_let) {
         make_edge(letter_cast(succ_let), letter_cast(pred_let));
     }
+
+    jj_vm::ir::BasicBlock* get_bb(size_t id) const {
+        return m_basic_blocks.at(id);
+    }
 };
 
 class DFSInterface : public TestBuilder {
