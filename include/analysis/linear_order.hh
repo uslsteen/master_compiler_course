@@ -5,13 +5,6 @@
 #include "graph/dom3.hh"
 #include "loop_analyzer.hh"
 //
-#include <algorithm>
-#include <functional>
-#include <iostream>
-#include <list>
-#include <stack>
-#include <unordered_map>
-#include <utility>
 #include <vector>
 
 namespace jj_ir::analysis::order {

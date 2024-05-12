@@ -4,12 +4,8 @@
 #include "graph/dom3.hh"
 #include "loop_base.hh"
 //
-#include <algorithm>
-#include <functional>
-#include <iostream>
 #include <list>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
 namespace jj_vm::analysis::loop {
@@ -37,9 +33,6 @@ private:
 
     std::unordered_map<node_pointer, loop_base_pointer> m_data{};
     std::list<loop_base> m_loops;
-    //
-    template <typename T>
-    friend class LoopTreeBuilder;
 
 public:
     LoopTree() = default;
