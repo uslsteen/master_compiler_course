@@ -17,6 +17,7 @@ enum class Opcode : uint16_t {
     SUB,
     MUL,
     DIV,
+    EQ,
     LE,
     GE,
     /* Contorl flow */
