@@ -1,9 +1,11 @@
 #pragma once
 
 #include <cassert>
+#include <cstddef>
 //
 #include <type_traits>
 #include <utility>
+#include <iterator>
 //
 #include "instruction.hh"
 #include "instructions.hh"
@@ -12,6 +14,44 @@
 namespace jj_vm::ir {
 
 class Function;
+
+/**
+ * @brief Linear continious liveness interval
+ */
+class LiveInterval final {
+    std::size_t m_begin{};
+    std::size_t m_end{};
+    //
+public:
+    LiveInterval() = default;
+    LiveInterval(std::size_t begin, std::size_t end)
+        : m_begin(begin), m_end(end) {
+        // assert(m_begin > m_end && "Error: invalid interval, begin > end");
+    }
+    //
+    auto begin() const noexcept { return m_begin; }
+    auto end() const noexcept { return m_end; }
+    //
+    void set_begin(std::size_t begin) { m_begin = begin; }
+    void set_end(std::size_t end) { m_end = end; }
+    //
+    void update(const LiveInterval& other) {
+        m_begin = std::min(other.m_begin, m_begin);
+        m_end = std::max(other.m_end, m_end);
+    }
+    //
+    bool is_equal(const LiveInterval& other) const noexcept {
+        return m_begin == other.m_begin && m_end == other.m_end;
+    }
+};
+
+bool operator==(const LiveInterval& lhs, const LiveInterval& rhs) {
+    return lhs.is_equal(rhs);
+}
+
+bool operator!=(const LiveInterval& lhs, const LiveInterval& rhs) {
+    return !(lhs == rhs);
+}
 
 /**
  * @brief Linear part of the code
@@ -23,7 +63,7 @@ public:
     //
     using iterator = InstrList::iterator;
     using const_iterator = InstrList::const_iterator;
-    using reverse_iterator = InstrList::iterator;
+    using reverse_iterator = InstrList::reverse_iterator;
     using const_reverse_iterator = InstrList::const_reverse_iterator;
     //
     using id_type = uint32_t;
@@ -37,7 +77,8 @@ private:
     //
     Function* m_parent = nullptr;
     //
-    void set_parent(Function* parent) noexcept { m_parent = parent; }
+    LiveInterval m_interval;
+    //
 
     //! NOTE: it should be hidden in private due access to private data & dumb
     //!       func naming
@@ -88,8 +129,16 @@ public:
     auto& preds() const noexcept { return m_preds; }
     auto& succs() const noexcept { return m_succs; }
 
+    auto interval() const noexcept { return m_interval; }
+
     Function* parent() noexcept { return m_parent; }
     const Function* parent() const noexcept { return m_parent; }
+
+    /**
+     * @brief Setters
+     */
+    auto set_interval(LiveInterval other) noexcept { m_interval = other; }
+    void set_parent(Function* parent) noexcept { m_parent = parent; }
 
     /// Get front/back instruction of the basic block
     auto& front() noexcept { return m_instr.front(); }
@@ -103,9 +152,15 @@ public:
      */
     iterator begin() { return m_instr.begin(); }
     const_iterator begin() const { return m_instr.begin(); }
+    auto rbegin() { return std::reverse_iterator{end()}; }
+    auto rbegin() const { return std::reverse_iterator{end()}; }
 
     iterator end() { return m_instr.end(); }
     const_iterator end() const { return m_instr.end(); }
+    auto rend() { return std::reverse_iterator{begin()}; }
+    auto rend() const {
+        return std::reverse_iterator{begin()};
+    }
 
     ///
     void dump(std::ostream& os) {

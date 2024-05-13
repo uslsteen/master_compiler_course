@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "intrusive_list/ilist.hh"
 #include "opcodes.hh"
 //
@@ -24,10 +26,10 @@ class IRBuilder;
 class Instr;
 class BasicBlock;
 
-
 /**
  * @brief Type enum wrapper for standart jj_vm types, which described in Typeid
- *        I suppose this class may be usefull in future during CastInstr implementation
+ *        I suppose this class may be usefull in future during CastInstr
+ * implementation
  */
 class Type final {
     TypeId m_id;
@@ -68,10 +70,15 @@ public:
  */
 class Instr : public Value, public ilist_detail::ilist_node {
     //
+protected:
     Opcode m_opcode = Opcode::NONE;
     BasicBlock* m_parent = nullptr;
     //
-protected:
+    std::size_t m_live{};
+    std::size_t m_lin{};
+    //
+    std::vector<Value*> m_inputs;
+    //
     Instr() = default;
     //
     Instr(Opcode opc, BasicBlock* bb = nullptr) : m_opcode(opc), m_parent(bb) {}
@@ -95,10 +102,27 @@ public:
     const BasicBlock* parent() const { return m_parent; }
     BasicBlock* parent() { return m_parent; }
 
+    auto live() const noexcept { return m_live; }
+    auto lin() const noexcept { return m_lin; }
+
+    Value* get_input(std::size_t id) { return m_inputs.at(id); }
+
+    auto begin() { return m_inputs.begin(); }
+    auto begin() const { return m_inputs.begin(); }
+
+    auto end() { return m_inputs.end(); }
+    auto end() const { return m_inputs.end(); }
+
+    /**
+     * @brief Setters
+     */
+    void set_live(std::size_t live) { m_live = live; }
+    void set_lin(std::size_t lin) { m_lin = lin; }
+
     virtual void dump(std::ostream& os) = 0;
     //
     //
     friend IRBuilder;
-    friend BasicBlock; 
+    friend BasicBlock;
 };
 }  // namespace jj_vm::ir

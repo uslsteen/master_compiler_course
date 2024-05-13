@@ -188,12 +188,17 @@ protected:
 
 class LivenessInterface : public TestBuilder {
 protected:
-    using LiveIntevalTy = jj_vm::analysis::liveness::LiveInterval;
+    using LiveIntevalTy = jj_vm::ir::LiveInterval;
 
     jj_vm::analysis::liveness::LivenessAnalyzer<jj_vm::graph::BBGraph>
         m_analyzer;
 
-    LivenessInterface() = default;
+    std::vector<std::size_t> ref_live_nums;
+    std::vector<LiveIntevalTy> ref_life_ranges;
+
+    LivenessInterface(std::initializer_list<std::size_t> live_nums,
+                      std::vector<LiveIntevalTy>&& life_ranges)
+        : ref_live_nums(live_nums), ref_life_ranges(life_ranges){};
 
     void build() {
         m_analyzer = jj_vm::analysis::liveness::LivenessBuilder<
