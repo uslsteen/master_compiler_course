@@ -13,6 +13,7 @@
 #include "analysis/linear_order.hh"
 #include "analysis/liveness_analyzer.hh"
 #include "analysis/loop_analyzer.hh"
+#include "analysis/reg_alloc.hh"
 #include "graph/dom3.hh"
 
 namespace jj_vm::testing {
@@ -204,17 +205,22 @@ protected:
         m_analyzer = jj_vm::analysis::liveness::LivenessBuilder<
             jj_vm::graph::BBGraph>::build(m_func->bb_graph());
     }
+};
 
-    //
-    bool check_live_invervals(const LiveIntevalTy& lhs,
-                              const LiveIntevalTy& rhs) {
-        //
-        return true;
-    }
+class RegAllocInterface : public TestBuilder {
+protected:
+    static constexpr std::size_t kRegsNum = 3;
+    jj_vm::analysis::regalloc::RegAllocAnalyzer<jj_vm::graph::BBGraph, kRegsNum>
+        m_regalloc;
 
-    bool check_live_numbers() {
+    RegAllocInterface() = default;
+
+    void build() {
+        m_regalloc = jj_vm::analysis::regalloc::RegAllocAnalyzer<
+            jj_vm::graph::BBGraph, kRegsNum>{m_func->bb_graph()};
         //
-        return true;
+        m_regalloc.run_scan();
     }
 };
+
 }  // namespace jj_vm::testing
