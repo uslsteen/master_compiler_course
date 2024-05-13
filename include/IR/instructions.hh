@@ -13,7 +13,7 @@
 namespace jj_vm::ir {
 
 class IfInstr final : public Instr {
-
+    //
     BasicBlock* m_true_bb = nullptr;
     BasicBlock* m_false_bb = nullptr;
     //
@@ -24,7 +24,9 @@ public:
         : Instr(Opcode::IF),
           m_true_bb(true_bb),
           m_false_bb(false_bb),
-          m_cond(cond) {}
+          m_cond(cond) {
+        m_inputs.push_back(cond);
+    }
 
     /**
      * @brief Getters
@@ -41,6 +43,7 @@ public:
  *
  */
 class BranchInstr final : public Instr {
+    //
     BasicBlock* m_dst = nullptr;
 
 public:
@@ -59,7 +62,9 @@ class RetInstr final : public Instr {
     Value* m_retval{};
 
 public:
-    RetInstr(Value* retval) : Instr(Opcode::RET), m_retval(retval) {}
+    RetInstr(Value* retval) : Instr(Opcode::RET), m_retval(retval) {
+        m_inputs.push_back(retval);
+    }
 
     /**
      * @brief Getters
@@ -71,16 +76,17 @@ public:
 };
 
 class BinInstr final : public Instr {
-public:
+    //
     Value* m_lhs = nullptr;
     Value* m_rhs = nullptr;
 
-    // protected:
 public:
     BinInstr(Opcode opc, Value* lhs, Value* rhs)
         : Instr(lhs->type(), opc), m_lhs(lhs), m_rhs(rhs) {
         //
         assert(lhs->type() == rhs->type());
+        m_inputs.push_back(lhs);
+        m_inputs.push_back(rhs);
     }
 
 public:
@@ -96,16 +102,20 @@ public:
 
 class PhiInstr final : public Instr {
     //
-    std::vector<Instr*> m_instrs{};
-    std::vector<BasicBlock*> m_basic_blocks{};
-    //
+    std::vector<std::pair<Instr*, BasicBlock*>> m_vars;
+
 public:
     PhiInstr(Type type) : Instr(type, Opcode::PHI) {}
     //
     void add_node(const std::pair<Instr*, BasicBlock*> input) {
-        m_instrs.push_back(input.first);
-        m_basic_blocks.push_back(input.second);
+        m_vars.push_back(input);
+        m_inputs.push_back(input.first);
     }
+
+    /**
+     * @brief Getters
+     */
+    auto vars() const noexcept { return m_vars; }
 
     /// Override dump
     void dump(std::ostream& os) override {}
@@ -113,10 +123,13 @@ public:
 
 //! NOTE: maybe inherit public UnaryInstr in future ???
 class CastInstr final : public Instr {
+    //
     Value* m_src_val = nullptr;
 
 public:
-    CastInstr(Type ty, Value* val) : Instr(ty, Opcode::CAST), m_src_val(val) {}
+    CastInstr(Type ty, Value* val) : Instr(ty, Opcode::CAST), m_src_val(val) {
+        m_inputs.push_back(val);
+    }
 
     /**
      * @brief Getters
