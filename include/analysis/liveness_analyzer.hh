@@ -159,7 +159,7 @@ private:
      */
     void process_inputs(const jj_vm::ir::Instr &instr, LiveSetTy &set,
                         std::size_t bb_start) {
-        for (auto *input : instr) {
+        for (auto *input : instr.inputs()) {
             assert(input != nullptr &&
                    "Error: input of instruction equals nullptr");
             set.insert(input);
