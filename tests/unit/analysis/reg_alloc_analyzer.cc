@@ -17,9 +17,18 @@ namespace jj_vm::testing {
 
 class RegAllocTest1 : public RegAllocInterface {
 protected:
-    std::vector<jj_vm::ir::Instr*> m_instr{};
+    std::vector<jj_vm::ir::Value*> m_vals{};
 
-    RegAllocTest1() = default;
+    RegAllocTest1()
+        : RegAllocInterface{{{0, false},
+                             {1, false},
+                             {1, true},
+                             {0, true},
+                             {1, false},
+                             {2, false},
+                             {2, false},
+                             {1, false},
+                             {0, false}}} {}
     /*
         lecture_test() {                    Live Num
         0:                                     0
@@ -44,6 +53,20 @@ protected:
           v9 = ADD i64 v2, v3                  26
           RET v9                               28
         }
+
+
+         |  0   2   4   6   8  10  12  14  16  18  20  22  24  26  28 |
+        0|     r0  r0  r0  r0  r0  r0  r0  r0  r0  r0  r0  r0         |
+        1|         r1  r1  r1  r1                                     |
+        2|             s1  s1  s1  s1  s1  s1  s1  s1  s1  s1  s1     |
+        3|                     s0  s0  s0  s0  s0  s0  s0  s0  s0     |
+        4|                     r1  r1  r1  r1  r1  r1                 |
+        5|                         r2  r2                             |
+        6|                                                            |
+        7|                                     r2  r2  r2  r2         |
+        8|                                         r1  r1  r1         |
+        9|                                                     r0  r0 |
+
     */
     void make_ir() {
         jj_vm::ir::IRBuilder builder{};
@@ -91,9 +114,8 @@ protected:
 
         //
 
-        for (auto&& value : std::vector<jj_vm::ir::Value*>{v0, v1, v2, v3, v4,
-                                                           v5, v6, v7, v8, v9})
-            m_instr.push_back(static_cast<jj_vm::ir::Instr*>(value));
+        m_vals =
+            std::vector<jj_vm::ir::Value*>{v0, v1, v2, v3, v4, v5, v7, v8, v9};
     }
 
     void create_test() {
@@ -102,5 +124,10 @@ protected:
     }
 };
 
-TEST_F(RegAllocTest1, lecture) { create_test(); }
+TEST_F(RegAllocTest1, lecture) {
+    create_test();
+    //
+    for (std::size_t i = 0; i < m_vals.size(); ++i)
+        EXPECT_EQ(m_regalloc->get_location(m_vals.at(i)), ref_locations[i]);
+}
 }  // namespace jj_vm::testing
