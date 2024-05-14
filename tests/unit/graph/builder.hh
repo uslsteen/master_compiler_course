@@ -210,16 +210,22 @@ protected:
 class RegAllocInterface : public TestBuilder {
 protected:
     static constexpr std::size_t kRegsNum = 3;
-    jj_vm::analysis::regalloc::RegAllocAnalyzer<jj_vm::graph::BBGraph, kRegsNum>
-        m_regalloc;
+    using RegAllocTy =
+        jj_vm::analysis::regalloc::RegAllocAnalyzer<jj_vm::graph::BBGraph,
+                                                    kRegsNum>;
+    using LocationTy = jj_vm::analysis::regalloc::Location;
 
-    RegAllocInterface() = default;
+    std::unique_ptr<RegAllocTy> m_regalloc;
+    std::vector<LocationTy> ref_locations;
+
+    RegAllocInterface(std::vector<LocationTy>&& locations)
+        : ref_locations(locations) {}
 
     void build() {
-        m_regalloc = jj_vm::analysis::regalloc::RegAllocAnalyzer<
-            jj_vm::graph::BBGraph, kRegsNum>{m_func->bb_graph()};
+        m_regalloc = std::make_unique<std::decay_t<decltype(*m_regalloc)>>(
+            m_func->bb_graph());
         //
-        m_regalloc.run_scan();
+        m_regalloc->linear_scan();
     }
 };
 

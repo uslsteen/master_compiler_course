@@ -3,9 +3,10 @@
 #include <cassert>
 #include <cstddef>
 //
+#include <iterator>
+#include <ostream>
 #include <type_traits>
 #include <utility>
-#include <iterator>
 //
 #include "instruction.hh"
 #include "instructions.hh"
@@ -28,7 +29,7 @@ public:
         : m_begin(begin), m_end(end) {
         // assert(m_begin > m_end && "Error: invalid interval, begin > end");
     }
-    //
+
     auto begin() const noexcept { return m_begin; }
     auto end() const noexcept { return m_end; }
     //
@@ -45,12 +46,22 @@ public:
     }
 };
 
+struct ComparePEnd {
+    bool operator()(const LiveInterval* lhs, const LiveInterval* rhs) const {
+        return lhs->end() < rhs->end();
+    }
+};
+
 bool operator==(const LiveInterval& lhs, const LiveInterval& rhs) {
     return lhs.is_equal(rhs);
 }
 
 bool operator!=(const LiveInterval& lhs, const LiveInterval& rhs) {
     return !(lhs == rhs);
+}
+
+std::ostream& operator<<(std::ostream& in, const LiveInterval& data) {
+    return in << "(" << data.begin() << ", " << data.end() << ")";
 }
 
 /**
@@ -158,9 +169,7 @@ public:
     iterator end() { return m_instr.end(); }
     const_iterator end() const { return m_instr.end(); }
     auto rend() { return std::reverse_iterator{begin()}; }
-    auto rend() const {
-        return std::reverse_iterator{begin()};
-    }
+    auto rend() const { return std::reverse_iterator{begin()}; }
 
     ///
     void dump(std::ostream& os) {
