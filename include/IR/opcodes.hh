@@ -17,6 +17,8 @@ enum class Opcode : uint16_t {
     SUB,
     MUL,
     DIV,
+    SHR,
+    XOR,
     EQ,
     LE,
     GE,

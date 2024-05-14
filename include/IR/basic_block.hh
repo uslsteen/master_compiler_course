@@ -125,6 +125,7 @@ public:
         succ->add_pred(pred);
     }
 
+
     /**
      * @brief Getters
      */
@@ -150,6 +151,18 @@ public:
      */
     auto set_interval(LiveInterval other) noexcept { m_interval = other; }
     void set_parent(Function* parent) noexcept { m_parent = parent; }
+
+    /**
+     * @brief Modifiers
+     */
+    auto erase(Instr* instr) { return m_instr.erase(iterator{instr}); }
+
+    void replace_instr(Instr* old_instr, Instr* new_instr) {
+        assert(old_instr->parent() == this);
+        new_instr->replace_users(*old_instr);
+        m_instr.insert(erase(old_instr), new_instr);
+        new_instr->set_parent(this);
+    }
 
     /// Get front/back instruction of the basic block
     auto& front() noexcept { return m_instr.front(); }
@@ -203,4 +216,16 @@ private:
     //
     friend IRBuilder;
 };
+
+void erase(BasicBlock* bb, Instr* instr) {
+    assert(bb == instr->parent());
+    instr->clean_inputs();
+    bb->erase(instr);
+}
+
+void erase(Instr* instr) {
+    instr->clean_inputs();
+    instr->parent()->erase(instr);
+}
+
 }  // namespace jj_vm::ir
