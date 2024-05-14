@@ -2,6 +2,7 @@
 #define OPCODES_HH
 
 #include <cstdint>
+#include <set>
 
 namespace jj_vm::ir {
 
@@ -32,7 +33,6 @@ enum class Opcode : uint16_t {
     CONST,
     //! NOTE: etc
 };
-
-}  // namespace jj_vm
+}  // namespace jj_vm::ir
 
 #endif  // OPCODES_HH
