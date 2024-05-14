@@ -25,7 +25,7 @@ public:
           m_true_bb(true_bb),
           m_false_bb(false_bb),
           m_cond(cond) {
-        m_inputs.push_back(cond);
+        add_input(cond);
     }
 
     /**
@@ -33,6 +33,7 @@ public:
      */
     auto true_bb() const noexcept { return m_true_bb; }
     auto false_bb() const noexcept { return m_false_bb; }
+    auto cond() const noexcept { return get_input(0); }
 
     /// Override dump
     void dump(std::ostream& os) override {}
@@ -63,13 +64,13 @@ class RetInstr final : public Instr {
 
 public:
     RetInstr(Value* retval) : Instr(Opcode::RET), m_retval(retval) {
-        m_inputs.push_back(retval);
+        add_input(retval);
     }
 
     /**
      * @brief Getters
      */
-    auto retval() const noexcept { return m_retval; }
+    auto retval() const noexcept { return get_input(0); }
 
     /// Override dump
     void dump(std::ostream& os) override {}
@@ -85,16 +86,16 @@ public:
         : Instr(lhs->type(), opc), m_lhs(lhs), m_rhs(rhs) {
         //
         assert(lhs->type() == rhs->type());
-        m_inputs.push_back(lhs);
-        m_inputs.push_back(rhs);
+        add_input(lhs);
+        add_input(rhs);
     }
 
 public:
     /**
      * @brief Getters
      */
-    auto lhs() const noexcept { return m_lhs; }
-    auto rhs() const noexcept { return m_rhs; }
+    auto lhs() const noexcept { return get_input(0); }
+    auto rhs() const noexcept { return get_input(1); }
 
     /// Override dump
     void dump(std::ostream& os) override {}
@@ -109,7 +110,7 @@ public:
     //
     void add_node(const std::pair<Instr*, BasicBlock*> input) {
         m_vars.push_back(input);
-        m_inputs.push_back(input.first);
+        add_input(input.first);
     }
 
     /**
@@ -128,7 +129,7 @@ class CastInstr final : public Instr {
 
 public:
     CastInstr(Type ty, Value* val) : Instr(ty, Opcode::CAST), m_src_val(val) {
-        m_inputs.push_back(val);
+        add_input(val);
     }
 
     /**

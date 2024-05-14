@@ -1,10 +1,12 @@
 #pragma once
 
+#include <unordered_set>
 #include <vector>
 
 #include "intrusive_list/ilist.hh"
 #include "opcodes.hh"
 //
+#include <algorithm>
 #include <iostream>
 
 namespace jj_vm::ir {
@@ -51,10 +53,20 @@ public:
 class Value {
 protected:
     Type m_type{};
+    std::unordered_set<Instr*> m_users;
 
 public:
     Value() = default;
     explicit Value(Type type) : m_type(type) {}
+
+    auto& users() const { return m_users; }
+    auto& users() { return m_users; }
+
+    void remove_user(Value* val) {
+        auto pos = std::find(m_users.begin(), m_users.end(), val);
+        m_users.erase(pos);
+    }
+    void replace_users(Value& other);
     //
     /**
      * @brief Getters
@@ -105,7 +117,8 @@ public:
     auto live() const noexcept { return m_live; }
     auto lin() const noexcept { return m_lin; }
 
-    Value* get_input(std::size_t id) { return m_inputs.at(id); }
+    auto inputs() const noexcept { return m_inputs; }
+    Value* get_input(std::size_t id) const { return m_inputs.at(id); }
 
     auto begin() { return m_inputs.begin(); }
     auto begin() const { return m_inputs.begin(); }
@@ -119,10 +132,43 @@ public:
     void set_live(std::size_t live) { m_live = live; }
     void set_lin(std::size_t lin) { m_lin = lin; }
 
+    void add_input(Value* val) {
+        val->users().insert(this);
+        m_inputs.push_back(val);
+    }
+
+    void set_input(std::size_t id, Value* val) {
+        auto& inp = m_inputs[id];
+
+        //! NOTE: check number of inputs
+        if (std::count(m_inputs.begin(), m_inputs.end(), inp) == 1)
+            inp->users().erase(this);
+        //
+        inp = val;
+        inp->users().insert(this);
+    }
+
+    void clean_inputs() {
+        for (auto* input : m_inputs) input->users().erase(this);
+
+        m_inputs.clear();
+    }
+
     virtual void dump(std::ostream& os) = 0;
     //
     //
     friend IRBuilder;
     friend BasicBlock;
 };
+
+void Value::replace_users(Value& other) {
+    auto& cur_users = users();
+    cur_users.merge(other.users());
+    other.users().clear();
+
+    for (auto* user : cur_users) {
+        std::replace(user->begin(), user->end(), &other,
+                     this);
+    }
+}
 }  // namespace jj_vm::ir
