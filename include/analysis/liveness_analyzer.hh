@@ -40,7 +40,9 @@ public:
     /**
      * @brief Getters
      */
-    auto intervals() const noexcept { return m_intervals; }
+    auto &intervals() & { return m_intervals; }
+    auto &&intervals() && { return std::move(m_intervals); }
+
     auto live_sets() const noexcept { return m_live_sets; }
 
     const LiveIntevalTy *get_interval(jj_vm::ir::Value *val) const {
