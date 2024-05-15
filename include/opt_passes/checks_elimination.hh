@@ -94,6 +94,7 @@ public:
             if (is_null_check && (user != &instr) && dominates(user, &instr)) {
                 input->remove_user(&instr);
                 instr.parent()->erase(&instr);
+                return;
             }
         }
     }
@@ -112,7 +113,9 @@ public:
                 auto* user_bounds = user->get_input(1);
                 if (bounds == user_bounds && dominates(user, &instr)) {
                     input->remove_user(&instr);
+                    bounds->remove_user(&instr);
                     instr.parent()->erase(&instr);
+                    return;
                 }
             }
         }

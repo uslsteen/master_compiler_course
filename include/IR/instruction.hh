@@ -62,9 +62,7 @@ public:
     auto& users() const { return m_users; }
     auto& users() { return m_users; }
 
-    void remove_user(Instr* instr) {
-        m_users.erase(instr);
-    }
+    void remove_user(Instr* instr) { m_users.erase(instr); }
     void replace_users(Value& other);
     //
     /**
@@ -92,9 +90,10 @@ protected:
     //
     Instr() = default;
     //
-    Instr(Opcode opc, BasicBlock* bb = nullptr) : m_opcode(opc), m_parent(bb) {}
     Instr(Type type, Opcode opc = Opcode::NONE, BasicBlock* bb = nullptr)
         : Value{type}, m_opcode(opc), m_parent(bb) {}
+    //
+    Instr(Opcode opc, BasicBlock* bb = nullptr) : m_opcode(opc), m_parent(bb) {}
 
     void set_parent(BasicBlock* parent) noexcept { m_parent = parent; }
     //
@@ -164,9 +163,7 @@ void Value::replace_users(Value& other) {
     cur_users.merge(other.users());
     other.users().clear();
 
-    for (auto* user : cur_users) {
-        std::replace(user->begin(), user->end(), &other,
-                     this);
-    }
+    for (auto* user : cur_users)
+        std::replace(user->begin(), user->end(), &other, this);
 }
 }  // namespace jj_vm::ir

@@ -82,7 +82,7 @@ TEST_F(FoldingBuilder, XOR) {
     //
     ASSERT_EQ(last_instr.opcode(), jj_vm::ir::Opcode::CONST);
     ASSERT_EQ(last_instr.type(), jj_vm::ir::TypeId::I64);
-
+    //
     const auto &folded_const =
         static_cast<const jj_vm::ir::ConstI64&>(last_instr);
 

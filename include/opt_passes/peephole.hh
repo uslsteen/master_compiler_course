@@ -11,6 +11,11 @@
 
 namespace jj_vm::passes {
 class Peephole : Pass, PassVisitor {
+public:
+    using GraphTy = jj_vm::graph::BBGraph;
+    using node_pointer = typename GraphTy::node_pointer;
+    using node_iterator = typename GraphTy::node_iterator;
+
 private:
     std::vector<std::reference_wrapper<jj_vm::ir::Instr>> m_instrs{};
 
@@ -89,8 +94,10 @@ public:
                 return compare_val<int32_t, int32_t{const_value}>(instr);
             case jj_vm::ir::TypeId::I64:
                 return compare_val<int64_t, int64_t{const_value}>(instr);
-            default:
+            default: {
                 assert(false && "Error: unsupported constant type in peephole");
+                return false;
+            }
         }
     }
 
@@ -110,8 +117,10 @@ public:
                 return compare_val<int32_t>(lhs, rhs);
             case jj_vm::ir::TypeId::I64:
                 return compare_val<int64_t>(lhs, rhs);
-            default:
+            default: {
                 assert(false && "Error: unsupported constant type in peephole");
+                return false;
+            }
         }
     }
 

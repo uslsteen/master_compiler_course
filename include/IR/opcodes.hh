@@ -34,6 +34,7 @@ enum class Opcode : uint16_t {
     CAST,
     CONST,
     PARAM,
+    CALL,
     /* Checks Elimiation */
     BOUNDS_CHECK,
     NULL_CHECK

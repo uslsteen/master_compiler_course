@@ -205,7 +205,7 @@ TEST(fib, init) {
     // v5 = phi i64 [v1, bb0], [v9, bb2]
     v5->add_node(std::make_pair(v1, bb0));
     v5->add_node(std::make_pair(v7, bb2));
-    
+
 }
 
 }

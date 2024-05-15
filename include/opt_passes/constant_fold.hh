@@ -14,6 +14,9 @@ namespace jj_vm::passes {
 class ConstantFold : Pass, PassVisitor {
 public:
     using OpcodeTy = jj_vm::ir::Opcode;
+    using GraphTy = jj_vm::graph::BBGraph;
+    using node_pointer = typename GraphTy::node_pointer;
+    using node_iterator = typename GraphTy::node_iterator;
 
 private:
     std::vector<std::reference_wrapper<jj_vm::ir::Instr>> m_instrs{};
@@ -127,9 +130,8 @@ public:
                 return eval_binary_operation<std::int32_t>(lhs, rhs, opcode);
             case jj_vm::ir::TypeId::I64:
                 return eval_binary_operation<std::int64_t>(lhs, rhs, opcode);
-            case jj_vm::ir::TypeId::NONE: {
+            case jj_vm::ir::TypeId::NONE:
                 assert(false && "Error: uknown folding type");
-            }
         }
     }
 

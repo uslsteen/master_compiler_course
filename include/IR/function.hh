@@ -1,11 +1,11 @@
 #pragma once
 
-#include <type_traits>
 #include <string_view>
+#include <type_traits>
 
 #include "basic_block.hh"
-#include "instruction.hh"
 #include "graph/bb_graph.hh"
+#include "instruction.hh"
 
 namespace jj_vm::ir {
 
@@ -73,9 +73,7 @@ public:
     const_iterator end() const { return m_basic_blocks.end(); }
 
     /// O(n)
-    size_t size() const {
-        return m_basic_blocks.size();
-    }
+    size_t size() const { return m_basic_blocks.size(); }
 
     /// O(1)
     bool empty() const { return m_basic_blocks.empty(); }
@@ -93,10 +91,21 @@ public:
     //
 
     std::string_view name() const noexcept { return m_func_name; }
+    Type func_ty() const noexcept { return m_func_ty; }
 
     auto bb_graph() noexcept {
-        assert(!m_basic_blocks.empty() && "Error : function hasn't any basic blocks to create graph");
-        return jj_vm::graph::BBGraph{&m_basic_blocks.front(), m_basic_blocks.size()};
+        assert(!m_basic_blocks.empty() &&
+               "Error : function hasn't any basic blocks to create graph");
+        return jj_vm::graph::BBGraph{&m_basic_blocks.front(),
+                                     m_basic_blocks.size()};
+    }
+
+    void erase(BasicBlock* to_erase) {
+        m_basic_blocks.erase(iterator{to_erase});
+    }
+
+    void splice(iterator pos, Function& src) {
+        m_basic_blocks.splice(pos, src.m_basic_blocks);
     }
 };
 
@@ -120,4 +129,29 @@ Param* Function::create<Param>(Type&& type) {
     return &emplace_back<Param>(m_args, type);
 }
 
+BasicBlock* split_bb_after(BasicBlock* block, Instr* instr) {
+    assert(instr->parent() == block);
+    //
+    Function* parent = block->parent();
+    BasicBlock* new_block = block->parent()->create<jj_vm::ir::BasicBlock>();
+    new_block->splice(new_block->end(), std::next(BasicBlock::iterator{instr}),
+                      instr->parent()->end());
+    //
+    return new_block;
+}
+
+class CallInstr final : public Instr {
+    jj_vm::ir::Function* m_callee{};
+
+public:
+    explicit CallInstr(Type type, jj_vm::ir::Function* callee)
+        : Instr(type, jj_vm::ir::Opcode::CALL), m_callee(callee) {}
+
+    void add_arg(Value* arg) { add_input(arg); }
+
+    jj_vm::ir::Function* callee() const { return m_callee; }
+
+    /// Override dump
+    void dump(std::ostream& os) override {}
+};
 }  // namespace jj_vm::ir
