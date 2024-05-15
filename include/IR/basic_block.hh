@@ -11,6 +11,7 @@
 #include "instruction.hh"
 #include "instructions.hh"
 #include "intrusive_list/ilist.hh"
+#include "opcodes.hh"
 
 namespace jj_vm::ir {
 
@@ -26,9 +27,7 @@ class LiveInterval final {
 public:
     LiveInterval() = default;
     LiveInterval(std::size_t begin, std::size_t end)
-        : m_begin(begin), m_end(end) {
-        // assert(m_begin > m_end && "Error: invalid interval, begin > end");
-    }
+        : m_begin(begin), m_end(end) {}
 
     auto begin() const noexcept { return m_begin; }
     auto end() const noexcept { return m_end; }
@@ -125,6 +124,13 @@ public:
         succ->add_pred(pred);
     }
 
+    static void remove_link(BasicBlock* succ, BasicBlock* pred) noexcept {
+        auto& preds = succ->m_preds;
+        preds.erase(std::find(preds.begin(), preds.end(), pred));
+        //
+        auto& succs = pred->m_succs;
+        succs.erase(std::find(succs.begin(), succs.end(), succ));
+    }
 
     /**
      * @brief Getters
@@ -150,7 +156,6 @@ public:
      * @brief Setters
      */
     auto set_interval(LiveInterval other) noexcept { m_interval = other; }
-    void set_parent(Function* parent) noexcept { m_parent = parent; }
 
     /**
      * @brief Modifiers
@@ -162,6 +167,50 @@ public:
         new_instr->replace_users(*old_instr);
         m_instr.insert(erase(old_instr), new_instr);
         new_instr->set_parent(this);
+    }
+
+    void splice(iterator pos, BasicBlock& other) {
+        splice(pos, other.begin(), other.end());
+    }
+
+    void splice(iterator pos, iterator first, iterator last) {
+        std::for_each(first, last, [this](jj_vm::ir::Instr& instr) {
+            instr.set_parent(this);
+        });
+        bool is_end = (pos == m_instr.end());
+
+        m_instr.splice(pos, first, last);
+
+        if (is_end) update();
+    }
+
+    void update() {
+        for (auto succ : m_succs) remove_link(this, succ);
+        if (m_instr.empty())
+            return;
+        else {
+            auto& last_instr = m_instr.back();
+            if (last_instr.opcode() == Opcode::BRANCH) {
+                const auto& branch_instr =
+                    static_cast<const BranchInstr&>(last_instr);
+                link_blocks(branch_instr.dst(), this);
+            } else if (last_instr.opcode() == Opcode::IF) {
+                const auto& if_instr = static_cast<const IfInstr&>(last_instr);
+                link_blocks(if_instr.true_bb(), this);
+                link_blocks(if_instr.false_bb(), this);
+            }
+        }
+    }
+
+    std::vector<Instr*> collect(Opcode opc) const noexcept {
+        std::vector<Instr*> collected{};
+
+        for (auto it = begin(); it != end(); ++it) {
+            const auto* pinstr = &*it;
+            if (pinstr->opcode() == opc)
+                collected.push_back(const_cast<Instr*>(pinstr));
+        }
+        return collected;
     }
 
     /// Get front/back instruction of the basic block
@@ -191,24 +240,43 @@ public:
     }
 
 private:
+    void set_parent(Function* parent) noexcept { m_parent = parent; }
+    void set_id(id_type id) { m_bb_id = id; }
+
     template <typename T, class... Args>
     auto push_back(Args&&... args) {
         //
         static_assert(std::is_base_of<Instr, T>::value,
-                      "Expected Instruction derived type");
+                      "Error: expected Instruction derived type");
         //
         auto* const inserted = static_cast<T*>(
             &emplace_back<T>(m_instr, std::forward<Args>(args)...));
         //
-        // NOTE: here
         if constexpr (std::is_same_v<IfInstr, T>) {
             link_blocks(inserted->true_bb(), this);
             link_blocks(inserted->false_bb(), this);
         } else if constexpr (std::is_same_v<BranchInstr, T>)
             link_blocks(inserted->dst(), this);
         //
+        inserted->set_parent(this);
+        return inserted;
+    }
 
-        // NOTE: is it really need ?
+    template <typename T, class... Args>
+    auto push_front(Args&&... args) {
+        //
+        static_assert(std::is_base_of<Instr, T>::value,
+                      "Error:expected Instruction derived type");
+        //
+        auto* const inserted = static_cast<T*>(
+            &emplace_front<T>(m_instr, std::forward<Args>(args)...));
+        //
+        // if constexpr (std::is_same_v<IfInstr, T>) {
+        //     link_blocks(inserted->true_bb(), this);
+        //     link_blocks(inserted->false_bb(), this);
+        // } else if constexpr (std::is_same_v<BranchInstr, T>)
+        //     link_blocks(inserted->dst(), this);
+        //
         inserted->set_parent(this);
         return inserted;
     }
@@ -227,5 +295,4 @@ void erase(Instr* instr) {
     instr->clean_inputs();
     instr->parent()->erase(instr);
 }
-
 }  // namespace jj_vm::ir

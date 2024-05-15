@@ -1,6 +1,7 @@
 #ifndef INSTR_HH
 #define INSTR_HH
 
+#include "basic_block.hh"
 #include "instruction.hh"
 #include "opcodes.hh"
 //
@@ -116,6 +117,10 @@ public:
 
 class PhiInstr final : public Instr {
     //
+public:
+    using phi_var_pair = std::pair<Instr*, BasicBlock*>;
+
+private:
     std::vector<std::pair<Instr*, BasicBlock*>> m_vars;
 
 public:
@@ -205,7 +210,6 @@ public:
     /// Override dump
     void dump(std::ostream& os) override {}
 };
-
 }  // namespace jj_vm::ir
 
 #endif  // INSTR_HH

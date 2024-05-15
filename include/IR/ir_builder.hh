@@ -1,7 +1,7 @@
 #pragma once
 
-#include "instructions.hh"
 #include "basic_block.hh"
+#include "instructions.hh"
 
 namespace jj_vm::ir {
 
@@ -33,6 +33,16 @@ public:
         created_instr->set_parent(m_bb);
         return created_instr;
     }
+
+    template <typename T, typename... Args>
+    T* emplace_front(Args&&... args) {
+        auto* const created_instr =
+            m_bb->push_front<T>(std::forward<Args>(args)...);
+        //
+        created_instr->set_parent(m_bb);
+        return created_instr;
+    }
+
     /**
      * @brief This specifies that created instructions should be appended to the
      *        end of the specified block.
@@ -42,6 +52,8 @@ public:
         m_bb = bb;
         m_insert_pt = m_bb->m_instr.end();
     }
+
+    void set_bb_id(BasicBlock* bb, BasicBlock::id_type id) { bb->set_id(id); }
 
     /**
      * @brief This specifies that created instructions should be inserted before

@@ -1,4 +1,4 @@
-set(TARGETS peephole constant_fold checks_elimination)
+set(TARGETS peephole constant_fold checks_elimination inlining)
 
 foreach(TARGET ${TARGETS})
     add_executable(${TARGET}_test ${TARGET}.cc)

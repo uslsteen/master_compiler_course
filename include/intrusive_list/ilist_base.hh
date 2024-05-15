@@ -68,10 +68,29 @@ protected:
     }
 
     //
+
     static void move_before(node_base_type *next, node_base_type *first,
                             node_base_type *last) {
-        static_assert(true &&
-                      "There is no move transfer semantic implementation");
+        assert(next != nullptr && "Error: next node is nullptr");
+        assert(first != nullptr && "Error: first node is nullptr");
+        assert(last != nullptr && "Error: last node is nullptr");
+
+        assert(next != first && "Error: unable to insert last before first");
+
+        if (last == next || first == last)
+            return;
+
+        auto *const to_insert = last->get_prev();
+        auto *const rbegin = first->get_prev();
+        last->set_prev(rbegin);
+        rbegin->set_next(last);
+
+        auto *const prev = next->get_prev();
+        next->set_prev(to_insert);
+        prev->set_next(first);
+
+        to_insert->set_next(next);
+        first->set_prev(prev);
     }
 };
 

@@ -115,7 +115,7 @@ public:
         return iterator{node};
     }
 
-    pointer remove(iterator& pos) noexcept {
+    pointer remove(iterator &pos) noexcept {
         pointer next_pnode = &*pos++;
         ilist_detail::ilist_base::remove(next_pnode);
         return next_pnode;
@@ -129,7 +129,7 @@ public:
     }
 
     iterator erase(iterator first, iterator last) noexcept {
-        while (first != last){
+        while (first != last) {
             first = erase(first);
         }
         //
@@ -152,7 +152,7 @@ public:
     /// Splice in a range of nodes from another list.
     void splice(iterator pos, iterator first, iterator last) noexcept {
         ilist_detail::ilist_base::move_before(
-            *pos.get_pnode(), *first.get_pnode(), *last.get_pnode());
+            pos.get_pnode(), first.get_pnode(), last.get_pnode());
     }
 
     void clear() { erase(begin(), end()); };
@@ -175,6 +175,13 @@ template <class T, class... Args, class NodeTy>
 auto &emplace_back(ilist<NodeTy> &ilist, Args &&...args) {
     auto *to_emplace = new T{std::forward<Args>(args)...};
     ilist.push_back(to_emplace);
+    return *to_emplace;
+}
+
+template <class T, class... Args, class NodeTy>
+auto &emplace_front(ilist<NodeTy> &ilist, Args &&...args) {
+    auto *to_emplace = new T{std::forward<Args>(args)...};
+    ilist.push_front(to_emplace);
     return *to_emplace;
 }
 }  // namespace jj_vm
