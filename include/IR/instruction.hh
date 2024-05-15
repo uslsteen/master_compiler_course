@@ -62,9 +62,8 @@ public:
     auto& users() const { return m_users; }
     auto& users() { return m_users; }
 
-    void remove_user(Value* val) {
-        auto pos = std::find(m_users.begin(), m_users.end(), val);
-        m_users.erase(pos);
+    void remove_user(Instr* instr) {
+        m_users.erase(instr);
     }
     void replace_users(Value& other);
     //
@@ -155,7 +154,6 @@ public:
     }
 
     virtual void dump(std::ostream& os) = 0;
-    //
     //
     friend IRBuilder;
     friend BasicBlock;

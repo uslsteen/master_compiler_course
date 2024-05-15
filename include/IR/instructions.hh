@@ -2,6 +2,7 @@
 #define INSTR_HH
 
 #include "instruction.hh"
+#include "opcodes.hh"
 //
 #include <cassert>
 #include <cstddef>
@@ -101,6 +102,18 @@ public:
     void dump(std::ostream& os) override {}
 };
 
+class UnaryInstr final : public Instr {
+public:
+    UnaryInstr(Opcode opc, Value* val) : Instr(val->type(), opc) {
+        add_input(val);
+    }
+
+    auto val() const noexcept { return get_input(0); }
+
+    /// Override dump
+    void dump(std::ostream& os) override {}
+};
+
 class PhiInstr final : public Instr {
     //
     std::vector<std::pair<Instr*, BasicBlock*>> m_vars;
@@ -176,6 +189,22 @@ CONSTANT_SPEC(int8_t, I8);
 CONSTANT_SPEC(int16_t, I16);
 CONSTANT_SPEC(int32_t, I32);
 CONSTANT_SPEC(int64_t, I64);
+
+/**
+ * @brief
+ */
+class ParamInstr final : public Instr {
+    std::string m_name{};
+
+public:
+    ParamInstr(std::string&& name, Type type)
+        : Instr(type, jj_vm::ir::Opcode::PARAM), m_name(std::move(name)) {}
+
+    auto name() const noexcept { return m_name; }
+
+    /// Override dump
+    void dump(std::ostream& os) override {}
+};
 
 }  // namespace jj_vm::ir
 

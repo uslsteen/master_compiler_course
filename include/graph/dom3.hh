@@ -17,7 +17,6 @@ class DomTree final {
 public:
     using value_type = typename GraphTy::value_type;
     using node_pointer = typename GraphTy::node_pointer;
-    // using const_node_pointer = typename GraphTy::const_node_pointer;
     using node_iterator = typename GraphTy::node_iterator;
     using id_type = typename GraphTy::value_type::id_type;
     //

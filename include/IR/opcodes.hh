@@ -23,6 +23,8 @@ enum class Opcode : uint16_t {
     EQ,
     LE,
     GE,
+    /* Unary instructions */
+    NEG,
     /* Contorl flow */
     RET,
     BRANCH,
@@ -31,7 +33,10 @@ enum class Opcode : uint16_t {
     PHI,
     CAST,
     CONST,
-    //! NOTE: etc
+    PARAM,
+    /* Checks Elimiation */
+    BOUNDS_CHECK,
+    NULL_CHECK
 };
 }  // namespace jj_vm::ir
 

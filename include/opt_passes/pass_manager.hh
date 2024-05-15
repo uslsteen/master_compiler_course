@@ -14,7 +14,6 @@ struct Pass {
 
 class PassManager {
 private:
-    jj_vm::ir::IRBuilder m_builder;
     jj_vm::ir::Function *m_fn;
     std::vector<std::unique_ptr<Pass>> m_passes;
     //
