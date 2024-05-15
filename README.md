@@ -1,19 +1,18 @@
-#  Master compiler course
+#  Compiler optimizations
 
-Compiler optimizations course, 9th semestr, MIPT
+### JIT & AOT Compiler optimizations master course, MIPT
+______________________________________________________________
 
-- [Java Junior LLVM-like Intermediate Representation](https://github.com/uslsteen/master_compiler_course/tree/main/include/IR) 
-
-
-### Assignment 1, IR
-- Implementation of [basic IR](https://github.com/uslsteen/master_compiler_course/tree/main/include/IR) & [instrusive list](https://github.com/uslsteen/master_compiler_course/tree/main/include/intrusive_list)
-- [Unit test](https://github.com/uslsteen/master_compiler_course/blob/main/tests/unit/IR/IR.cc) to check correctness of builded IR and other entities
-
-### Assignment 2, DFS, Dominator Tree implememtation
-- Implementation of [deep first search](https://github.com/uslsteen/master_compiler_course/blob/main/include/graph/dfs.hh) & [dominator tree builder](https://github.com/uslsteen/master_compiler_course/blob/main/include/graph/dom3.hh) algorithms
-- [Unit test](https://github.com/uslsteen/master_compiler_course/tree/main/tests/unit/graph) to check correctness of [run DFS](https://github.com/uslsteen/master_compiler_course/blob/main/tests/unit/graph/dfs.cc) and [builded dominator tree](https://github.com/uslsteen/master_compiler_course/blob/main/tests/unit/graph/dom3.cc)
-
-### Assignment 3 Loop Analyser
-- Implementation of [basic Loop Analyser](https://github.com/uslsteen/master_compiler_course/blob/main/include/analysis/loop_analyzer.hh). It builds Loop Tree using Deep First Search algorithm and domimatee properties of nodes.
-- [Unit test](https://github.com/uslsteen/master_compiler_course/blob/main/tests/unit/analysis/loop_analyzer.cc) to check correctness of builded Loop Tree.
-
+| Task name              |  Source                                                                                                                                                                  | Tests  | Status |
+| :--------------------- | :------:                                                                                                                                                                 | :----: |:----:  |
+| 1. Intermediate representation                  |  [basic IR](https://github.com/uslsteen/master_compiler_course/tree/main/include/IR), [intrusive list](https://github.com/uslsteen/master_compiler_course/tree/main/include/intrusive_list)                                                                                                                                                                         | [Unit tests](https://github.com/uslsteen/master_compiler_course/blob/main/tests/unit/IR/IR.cc)       |  Done      |
+| 2. DFS                 |  [algorithm implementation](https://github.com/uslsteen/master_compiler_course/blob/main/include/graph/dfs.hh)                                                                                                                                                                        | [Unit tests](https://github.com/uslsteen/master_compiler_course/tree/main/tests/unit/graph)       |   Done     |
+| 3. Dominator Tree      |   [dominator tree builder](https://github.com/uslsteen/master_compiler_course/blob/main/include/graph/dom3.hh)                                                                                                                                                                       |   [Unit tests](https://github.com/uslsteen/master_compiler_course/blob/main/tests/unit/graph/dom3.cc)     |    Done    |
+| 5. Loop Analyzer       | [loop tree builder](https://github.com/uslsteen/master_compiler_course/blob/main/include/analysis/loop_analyzer.hh)                                                                                                                                                                         |  [Unit tests](https://github.com/uslsteen/master_compiler_course/blob/main/tests/unit/analysis/loop_analyzer.cc)      |    Done    |
+| 6. Linear Order        |  [linear order analyzer](https://github.com/uslsteen/master_compiler_course/blob/main/include/analysis/linear_order.hh)                                                                                                                                                                        |  [Unit tests](https://github.com/uslsteen/master_compiler_course/blob/main/tests/unit/analysis/order_analyzer.cc)      |   Done     |
+| 7. Liveness Analyzer   | [liveness scanner](https://github.com/uslsteen/master_compiler_course/blob/main/include/analysis/liveness_analyzer.hh)                                                                                                                                                                         | [Unit tests](https://github.com/uslsteen/master_compiler_course/blob/main/tests/unit/analysis/liveness_analyzer.cc)       | Done       |
+| 8. Regalloc scanner    | [regalloc scanner](https://github.com/uslsteen/master_compiler_course/blob/main/include/analysis/reg_alloc.hh)                                                                                                                                                                         | [Unit tests](https://github.com/uslsteen/master_compiler_course/blob/main/tests/unit/analysis/reg_alloc_analyzer.cc)       |  Done      |
+| 9. Peephole            | [pass implementation (MUL, XOR, SHR folding)](https://github.com/uslsteen/master_compiler_course/blob/main/include/opt_passes/peephole.hh)                                                                                                                                                                         |  [Unit tests](https://github.com/uslsteen/master_compiler_course/blob/main/tests/unit/opt_passes/peephole.cc)      |  Done      |
+| 10. Constant folding   | [pass implementation](https://github.com/uslsteen/master_compiler_course/blob/main/include/opt_passes/constant_fold.hh)                                                                                                                                                                         |  [Unit tests](https://github.com/uslsteen/master_compiler_course/blob/main/tests/unit/opt_passes/constant_fold.cc)      |    Done    |
+| 11. Inlining           | [pass implementation](https://github.com/uslsteen/master_compiler_course/blob/opt-passes/include/opt_passes/inlining.hh)                                                                                                                                                                         |        |  Work in progress      |
+| 12. Checks Elimination | [pass implemenation](https://github.com/uslsteen/master_compiler_course/blob/main/include/opt_passes/checks_elimination.hh)                                                                                                                                                                        |  [Unit tests](https://github.com/uslsteen/master_compiler_course/blob/main/tests/unit/opt_passes/checks_elimination.cc)      |   Done     |
