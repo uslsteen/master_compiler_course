@@ -25,12 +25,11 @@ option(BUILD_TESTS "Build tests" OFF)
 
 add_subdirectory(src)
 add_subdirectory(3rd_party)
-add_subdirectory(tests)
 
 # Test running stuff
 if(BUILD_TESTS)
   enable_testing()
-  add_subdirectory(test)
+  add_subdirectory(tests)
 endif()
 
 message("Libs: ${LIBLIST}")
