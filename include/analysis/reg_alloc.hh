@@ -9,6 +9,7 @@
 #include <ostream>
 #include <set>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 namespace jj_vm::analysis::regalloc {
@@ -74,10 +75,16 @@ public:
         }
 
         //! NOTE: getting order the life ranges
-        std::sort(m_data.begin(), m_data.end(),
-                  [](const auto& lhs, const auto& rhs) {
-                      return lhs.second->begin() < rhs.second->begin();
-                  });
+        std::sort(
+            m_data.begin(), m_data.end(), [](const auto& lhs, const auto& rhs) {
+                auto lbeg = lhs.second->begin(), rbeg = rhs.second->begin();
+                auto lend = lhs.second->end(), rend = rhs.second->end();
+                if (lbeg == rbeg) {
+                    if (lend == rbeg) return lhs.first < rhs.first;
+                    return lend < rend;
+                }
+                return lbeg < rbeg;
+            });
     }
 
 public:

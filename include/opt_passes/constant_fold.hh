@@ -67,6 +67,15 @@ public:
             case OpcodeTy::MUL:
                 result = lval * rval;
                 break;
+            case OpcodeTy::DIV: {
+                if (rval == 0)
+                    assert(false &&
+                           "Error: division by zero is not yet supported");
+                else {
+                    result = lval / rval;
+                    break;
+                }
+            }
             case OpcodeTy::SHR: {
                 if (rval >= std::numeric_limits<Type>::digits || rval < 0)
                     assert(false &&
@@ -89,8 +98,8 @@ public:
             case OpcodeTy::GE:
                 result = lval > rval;
                 break;
-            case OpcodeTy::DIV: {
-                //! NOTE: I don't want to process all issue with div ....
+            default: {
+                //! NOTE: I don't want to process all issues with div ....
                 assert(false &&
                        "Error: unsupported evaluation binary operation");
             }
@@ -101,8 +110,8 @@ public:
 
     std::unique_ptr<jj_vm::ir::Instr> fold_binary_operation(
         jj_vm::ir::Instr& instr) {
-        auto* lhs = static_cast<const jj_vm::ir::Instr *>(instr.get_input(0));
-        auto* rhs = static_cast<const jj_vm::ir::Instr *>(instr.get_input(1));
+        auto* lhs = static_cast<const jj_vm::ir::Instr*>(instr.get_input(0));
+        auto* rhs = static_cast<const jj_vm::ir::Instr*>(instr.get_input(1));
         //
         auto type = instr.type();
         auto opcode = instr.opcode();
